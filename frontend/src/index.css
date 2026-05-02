@@ -32,16 +32,16 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-bold rounded-xl transition-all duration-300;
-    @apply hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105;
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-900 text-white text-sm font-bold rounded-xl transition-all duration-300;
+    @apply hover:shadow-xl hover:shadow-blue-900/30 hover:scale-[1.02];
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2;
     @apply active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 text-sm font-bold rounded-xl border-2 border-slate-200 transition-all duration-300;
-    @apply hover:border-blue-600 hover:bg-blue-50 hover:shadow-lg;
-    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 text-sm font-semibold rounded-xl border-2 border-slate-200 transition-all duration-300;
+    @apply hover:border-blue-800 hover:bg-slate-50 hover:shadow-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2;
     @apply active:scale-95;
   }
 

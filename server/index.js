@@ -54,6 +54,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/resume', require('./routes/resumeRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
+app.use('/api/ai/advanced', require('./routes/advancedAIRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
 
 // 404 handler

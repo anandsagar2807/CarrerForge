@@ -8,7 +8,7 @@ const FloatingAIAssistant = () => {
     const navigate = useNavigate();
 
     const handleOpenChat = () => {
-        navigate('/chat');
+        navigate('/sign-up');
         setIsOpen(false);
     };
 

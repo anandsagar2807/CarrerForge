@@ -7,7 +7,7 @@ import {
     Upload, FileText, Briefcase, GraduationCap, Code,
     Award, Download, Eye, Save, Sparkles, ChevronLeft,
     Plus, Trash2, MapPin, Mail, Phone, Link as LinkIcon,
-    Linkedin, Github, ExternalLink, Trash
+    Linkedin, Github, ExternalLink, Trash, Loader
 } from 'lucide-react';
 import ResumePreview from '../components/ResumePreview';
 
@@ -37,6 +37,8 @@ const ResumeBuilderPage = () => {
     const [activeSection, setActiveSection] = useState('personal');
     const [jdText, setJdText] = useState(resumeData.jobDescription || '');
     const [showDownloadModal, setShowDownloadModal] = useState(false);
+    const [aiAnalysis, setAiAnalysis] = useState(null);
+    const [analyzingStrength, setAnalyzingStrength] = useState(false);
 
     useEffect(() => {
         if (templateId && templateId !== selectedTemplate) {
@@ -52,6 +54,44 @@ const ResumeBuilderPage = () => {
             setJdText(incomingJD);
         }
     }, [setJobDescription]);
+
+    // Dynamic AI Resume Strength Analysis
+    useEffect(() => {
+        const analyzeStrength = async () => {
+            setAnalyzingStrength(true);
+            try {
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+                const response = await fetch(`${apiUrl}/ai/advanced/analyze-strength`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        resumeData,
+                        jobDescription: jdText
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setAiAnalysis(data);
+                }
+            } catch (error) {
+                console.error('Failed to analyze resume strength:', error);
+            } finally {
+                setAnalyzingStrength(false);
+            }
+        };
+
+        // Debounce the analysis - only run after 2 seconds of no changes
+        const timeoutId = setTimeout(() => {
+            if (resumeData.personalInfo.fullName || resumeData.experience.length > 0) {
+                analyzeStrength();
+            }
+        }, 2000);
+
+        return () => clearTimeout(timeoutId);
+    }, [resumeData, jdText]);
 
     // Form sections config
     const sections = [
@@ -381,6 +421,15 @@ const ResumeBuilderPage = () => {
 
     // ✨ WOW FEATURE: Real-Time Resume Strength Indicator
     const getResumeStrength = () => {
+        if (aiAnalysis) {
+            const score = aiAnalysis.overallScore;
+            if (score >= 85) return { level: 'Excellent', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' };
+            if (score >= 70) return { level: 'Good', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' };
+            if (score >= 50) return { level: 'Fair', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' };
+            return { level: 'Needs Work', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' };
+        }
+
+        // Fallback to local calculation
         const score = calculateResumeScore();
         if (score >= 85) return { level: 'Excellent', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' };
         if (score >= 70) return { level: 'Good', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' };
@@ -390,6 +439,11 @@ const ResumeBuilderPage = () => {
 
     // ✨ WOW FEATURE: Smart Suggestion Engine
     const getSuggestions = () => {
+        if (aiAnalysis && aiAnalysis.suggestions) {
+            return aiAnalysis.suggestions.slice(0, 3);
+        }
+
+        // Fallback to local suggestions
         const suggestions = [];
         if (!resumeData.personalInfo.summary || resumeData.personalInfo.summary.length < 100) {
             suggestions.push({ icon: '📝', text: 'Add a professional summary to stand out', action: 'Add Summary' });
@@ -406,6 +460,10 @@ const ResumeBuilderPage = () => {
         return suggestions;
     };
 
+    const getDisplayScore = () => {
+        return aiAnalysis ? aiAnalysis.overallScore : calculateResumeScore();
+    };
+
     // Render active section form
     const renderForm = () => {
         const inputClass = "input-premium text-sm py-2.5";
@@ -417,7 +475,10 @@ const ResumeBuilderPage = () => {
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className={labelClass}>Full Name</label>
+                                <label className={labelClass}>
+                                    <span className="text-slate-700 text-sm font-bold">Full Name</span>
+                                    <span className="text-red-500 ml-1">*</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={resumeData.personalInfo.fullName}
@@ -427,7 +488,10 @@ const ResumeBuilderPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Email</label>
+                                <label className={labelClass}>
+                                    <span className="text-slate-700 text-sm font-bold">Email</span>
+                                    <span className="text-red-500 ml-1">*</span>
+                                </label>
                                 <input
                                     type="email"
                                     value={resumeData.personalInfo.email}
@@ -437,7 +501,10 @@ const ResumeBuilderPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Phone</label>
+                                <label className={labelClass}>
+                                    <span className="text-slate-700 text-sm font-bold">Phone</span>
+                                    <span className="text-red-500 ml-1">*</span>
+                                </label>
                                 <input
                                     type="tel"
                                     value={resumeData.personalInfo.phone}
@@ -447,7 +514,9 @@ const ResumeBuilderPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Location</label>
+                                <label className={labelClass}>
+                                    <span className="text-slate-700 text-sm font-bold">Location</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={resumeData.personalInfo.location}
@@ -457,7 +526,9 @@ const ResumeBuilderPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>LinkedIn</label>
+                                <label className={labelClass}>
+                                    <span className="text-slate-700 text-sm font-bold">LinkedIn</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={resumeData.personalInfo.linkedin}
@@ -467,7 +538,9 @@ const ResumeBuilderPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>GitHub / Portfolio</label>
+                                <label className={labelClass}>
+                                    <span className="text-slate-700 text-sm font-bold">GitHub / Portfolio</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={resumeData.personalInfo.github}
@@ -478,7 +551,10 @@ const ResumeBuilderPage = () => {
                             </div>
                         </div>
                         <div>
-                            <label className={labelClass}>Professional Summary</label>
+                            <label className={labelClass}>
+                                <span className="text-slate-700 text-sm font-bold">Professional Summary</span>
+                                <span className="text-red-500 ml-1">*</span>
+                            </label>
                             <textarea
                                 value={resumeData.personalInfo.summary}
                                 onChange={(e) => updatePersonalInfo('summary', e.target.value)}
@@ -748,9 +824,9 @@ const ResumeBuilderPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col overflow-hidden font-sans">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 flex flex-col overflow-hidden font-sans">
             {/* Top Bar */}
-            <div className="bg-white border-b border-slate-100 h-16 flex items-center justify-between px-6 shrink-0 relative z-20 shadow-sm">
+            <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 h-16 flex items-center justify-between px-6 shrink-0 relative z-20 shadow-sm">
                 <div className="flex items-center gap-6">
                     <button
                         onClick={() => navigate('/templates')}
@@ -759,13 +835,11 @@ const ResumeBuilderPage = () => {
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                         <span>Back</span>
                     </button>
-                    <div className="w-px h-6 bg-slate-100 hidden md:block" />
+                    <div className="w-px h-6 bg-slate-200 hidden md:block" />
                     <div className="flex items-center gap-2.5">
-                        <div className="p-1.5 bg-slate-900 rounded-lg shadow-premium">
-                            <Sparkles className="w-3.5 h-3.5 text-white" />
-                        </div>
+                        <img src="/logo.png" alt="ResumeForge Pro" className="h-7 w-auto" />
                         <h1 className="font-display font-bold text-slate-900 tracking-tight hidden md:block">
-                            Resume Forge <span className="brand-text-gradient">Pro</span>
+                            Resume Forge <span className="bg-gradient-to-r from-blue-700 to-blue-900 bg-clip-text text-transparent">Pro</span>
                         </h1>
                     </div>
                 </div>
@@ -775,7 +849,7 @@ const ResumeBuilderPage = () => {
                         <Save className="w-4 h-4" />
                         <span>Draft Saved</span>
                     </button>
-                    <button onClick={() => setShowDownloadModal(true)} className="btn-premium-primary py-2 px-6 text-sm flex items-center gap-2">
+                    <button onClick={() => setShowDownloadModal(true)} className="bg-gradient-to-r from-blue-700 to-blue-900 text-white font-bold py-2 px-6 rounded-xl text-sm flex items-center gap-2 hover:shadow-lg transition-all">
                         <Download className="w-4 h-4" />
                         <span>Download</span>
                     </button>
@@ -783,123 +857,150 @@ const ResumeBuilderPage = () => {
             </div>
 
             <div className="flex flex-1 overflow-hidden">
-                {/* Left Sidebar - Navigation */}
-                <div className="w-20 md:w-64 bg-white border-r border-slate-100 flex flex-col shrink-0">
-                    <div className="flex-1 py-6 px-3 space-y-1 overflow-y-auto no-scrollbar">
-                        {sections.map((section) => (
-                            <button
-                                key={section.id}
-                                onClick={() => setActiveSection(section.id)}
-                                className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-300 ${activeSection === section.id
-                                    ? 'bg-slate-900 text-white shadow-premium'
-                                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                                    }`}
-                            >
-                                <div className="shrink-0">{section.icon}</div>
-                                <span className="hidden md:block font-bold text-sm tracking-tight">{section.label}</span>
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="p-4 border-t border-slate-100">
-                        <div className="bg-slate-50 rounded-2xl p-4 hidden md:block border border-slate-100">
-                            <div className="flex items-center gap-2 text-brand-600 mb-2">
-                                <Sparkles className="w-4 h-4" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">AI Powerup</span>
-                            </div>
-                            <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-                                Paste a job description to optimize your resume with AI.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Main Content Area */}
                 <div className="flex-1 flex overflow-hidden">
-                    {/* Editor Pane */}
-                    <div className="flex-1 overflow-y-auto bg-white/50 px-6 py-10 md:px-12">
-                        <div className="max-w-2xl mx-auto space-y-10">
+                    {/* Editor Pane - 55% */}
+                    <div className="w-full lg:w-[55%] overflow-y-auto bg-white/50 px-6 py-10 md:px-12">
+                        <div className="max-w-4xl mx-auto space-y-8">
                             {/* ✨ Resume Strength Indicator */}
-                            <div className={`rounded-2xl p-4 border ${getResumeStrength().border} ${getResumeStrength().bg}`}>
-                                <div className="flex items-center justify-between mb-3">
+                            <div className={`rounded-2xl p-6 border-2 ${getResumeStrength().border} ${getResumeStrength().bg} shadow-sm`}>
+                                <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
-                                        <Sparkles className="w-5 h-5 text-slate-500" />
-                                        <span className="font-semibold text-slate-900">Resume Strength</span>
+                                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                                            {analyzingStrength ? (
+                                                <Loader className="w-5 h-5 text-blue-700 animate-spin" />
+                                            ) : (
+                                                <Sparkles className="w-5 h-5 text-blue-700" />
+                                            )}
+                                        </div>
+                                        <div>
+                                            <span className="font-bold text-slate-900 block">Resume Strength</span>
+                                            <span className="text-xs text-slate-500">
+                                                {analyzingStrength ? 'Analyzing with AI...' : 'AI-powered ATS score'}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className={`font-bold text-lg ${getResumeStrength().color}`}>
-                                            {calculateResumeScore()}%
+                                    <div className="flex items-center gap-3">
+                                        <span className={`font-bold text-3xl ${getResumeStrength().color}`}>
+                                            {getDisplayScore()}%
                                         </span>
-                                        <span className={`text-sm font-semibold ${getResumeStrength().color}`}>
+                                        <span className={`text-sm font-bold px-3 py-1.5 rounded-full ${getResumeStrength().color} bg-white/60`}>
                                             {getResumeStrength().level}
                                         </span>
                                     </div>
                                 </div>
 
                                 {/* Animated Progress Bar */}
-                                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                                <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
                                     <div
-                                        className={`h-full rounded-full transition-all duration-1000 ease-out ${calculateResumeScore() >= 70 ? 'bg-emerald-500' :
-                                            calculateResumeScore() >= 50 ? 'bg-amber-500' : 'bg-red-500'
+                                        className={`h-full rounded-full transition-all duration-1000 ease-out ${getDisplayScore() >= 70 ? 'bg-gradient-to-r from-emerald-500 to-emerald-600' :
+                                            getDisplayScore() >= 50 ? 'bg-gradient-to-r from-amber-500 to-amber-600' : 'bg-gradient-to-r from-red-500 to-red-600'
                                             }`}
-                                        style={{ width: `${calculateResumeScore()}%` }}
+                                        style={{ width: `${getDisplayScore()}%` }}
                                     />
                                 </div>
 
+                                {/* AI Breakdown */}
+                                {aiAnalysis && aiAnalysis.breakdown && (
+                                    <div className="mt-5 grid grid-cols-3 gap-3">
+                                        {Object.entries(aiAnalysis.breakdown).slice(0, 6).map(([key, value]) => (
+                                            <div key={key} className="text-center p-2 bg-white/80 rounded-lg border border-slate-200/60">
+                                                <p className="text-xs text-slate-500 capitalize mb-1">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                                                <p className="text-lg font-bold text-slate-900">{value}%</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
                                 {/* Smart Suggestions */}
                                 {getSuggestions().length > 0 && (
-                                    <div className="mt-4 space-y-2">
-                                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Suggestions</p>
+                                    <div className="mt-5 space-y-2">
+                                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Quick Wins</p>
                                         {getSuggestions().map((suggestion, idx) => (
-                                            <div key={idx} className="flex items-center gap-3 p-2 rounded-lg bg-white/60">
-                                                <span className="text-lg">{suggestion.icon}</span>
-                                                <span className="text-sm text-slate-700 font-medium">{suggestion.text}</span>
+                                            <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-white/80 border border-slate-200/60 hover:border-blue-300 transition-all">
+                                                <span className="text-xl">{suggestion.icon}</span>
+                                                <span className="text-sm text-slate-700 font-semibold flex-1">{suggestion.text}</span>
+                                                {suggestion.priority && (
+                                                    <span className={`text-xs font-bold px-2 py-1 rounded ${
+                                                        suggestion.priority === 'Critical' ? 'bg-red-100 text-red-700' :
+                                                        suggestion.priority === 'High' ? 'bg-orange-100 text-orange-700' :
+                                                        'bg-blue-100 text-blue-700'
+                                                    }`}>
+                                                        {suggestion.priority}
+                                                    </span>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex items-center justify-between mt-6">
+                            {/* Horizontal Step Navigation */}
+                            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-2 border border-slate-200/60 shadow-sm">
+                                <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar">
+                                    {sections.map((section) => (
+                                        <button
+                                            key={section.id}
+                                            onClick={() => setActiveSection(section.id)}
+                                            className={`flex items-center gap-2 px-4 py-3 rounded-xl transition-all duration-300 whitespace-nowrap ${activeSection === section.id
+                                                ? 'bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg scale-105'
+                                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                                                }`}
+                                        >
+                                            <div className="shrink-0">{section.icon}</div>
+                                            <span className="font-bold text-sm tracking-tight hidden sm:block">{section.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
                                 <div>
                                     <h2 className="text-3xl font-display font-bold text-slate-900 mb-2">
                                         {sections.find(s => s.id === activeSection)?.label}
                                     </h2>
-                                    <p className="text-sm text-slate-500 font-medium">
+                                    <p className="text-sm text-slate-600 font-medium">
                                         Complete your profile to build a winning resume.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-premium">
+                            <div className="bg-white rounded-2xl p-8 border border-slate-200/60 shadow-lg">
                                 {renderForm()}
                             </div>
 
                             {/* AI Integration Section */}
-                            <div className="bg-slate-900 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl">
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-600/10 rounded-full blur-[80px]" />
+                            <div className="bg-gradient-to-br from-slate-900 to-blue-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-2xl">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-[100px]" />
+                                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[100px]" />
                                 <div className="relative z-10">
-                                    <div className="flex items-center gap-2 text-brand-400 mb-6">
-                                        <Sparkles className="w-5 h-5" />
-                                        <span className="text-xs font-black uppercase tracking-widest">AI Match Assistant</span>
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20">
+                                            <Sparkles className="w-5 h-5 text-blue-300" />
+                                        </div>
+                                        <div>
+                                            <span className="text-xs font-bold uppercase tracking-wider text-blue-300 block">AI Match Assistant</span>
+                                            <span className="text-xs text-slate-400">Optimize for job descriptions</span>
+                                        </div>
                                     </div>
-                                    <div className="space-y-6">
+                                    <div className="space-y-4">
                                         <textarea
                                             value={jdText}
                                             onChange={(e) => setJdText(e.target.value)}
-                                            className="w-full h-32 bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-500/50 transition-all resize-none"
-                                            placeholder="Paste job description here..."
+                                            className="w-full h-32 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all resize-none"
+                                            placeholder="Paste job description here to get AI-powered optimization..."
                                         />
                                         <div className="flex flex-wrap gap-3">
                                             <button
                                                 onClick={handleAnalyzeJD}
-                                                className="bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-6 rounded-xl text-sm transition-all flex items-center gap-2 shadow-xl shadow-brand-900/20"
+                                                className="bg-white text-slate-900 hover:bg-slate-100 font-bold py-3 px-6 rounded-xl text-sm transition-all flex items-center gap-2 shadow-xl"
                                             >
+                                                <Sparkles className="w-4 h-4" />
                                                 Analyze JD
                                             </button>
                                             <button
                                                 onClick={handleOptimizeResume}
-                                                className="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl text-sm transition-all border border-white/10"
+                                                className="bg-white/10 hover:bg-white/20 text-white font-bold py-3 px-6 rounded-xl text-sm transition-all border border-white/20 backdrop-blur-sm"
                                             >
                                                 Optimize with AI
                                             </button>
@@ -910,21 +1011,26 @@ const ResumeBuilderPage = () => {
                         </div>
                     </div>
 
-                    {/* Preview Pane - Desktop Only */}
-                    <div className="hidden xl:flex w-[600px] bg-slate-200 border-l border-slate-300 overflow-hidden flex-col">
-                        <div className="h-12 bg-slate-300/50 flex items-center justify-between px-6 shrink-0 border-b border-slate-300/50">
-                            <div className="flex items-center gap-2">
-                                <Eye className="w-4 h-4 text-slate-500" />
-                                <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Live Preview</span>
+                    {/* Preview Pane - 45% - Desktop Only */}
+                    <div className="hidden lg:flex w-[45%] bg-gradient-to-br from-slate-100 to-slate-200 border-l border-slate-300 overflow-hidden flex-col">
+                        <div className="h-14 bg-white/60 backdrop-blur-sm flex items-center justify-between px-6 shrink-0 border-b border-slate-300/60">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-gradient-to-br from-blue-700 to-blue-900 rounded-lg flex items-center justify-center shadow-sm">
+                                    <Eye className="w-4 h-4 text-white" />
+                                </div>
+                                <div>
+                                    <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block">Live Preview</span>
+                                    <span className="text-xs text-slate-500">Real-time updates</span>
+                                </div>
                             </div>
                             <div className="flex gap-2">
-                                <div className="w-3 h-3 rounded-full bg-slate-400/30" />
-                                <div className="w-3 h-3 rounded-full bg-slate-400/30" />
-                                <div className="w-3 h-3 rounded-full bg-slate-400/30" />
+                                <div className="w-3 h-3 rounded-full bg-red-400" />
+                                <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                                <div className="w-3 h-3 rounded-full bg-green-400" />
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-12 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px] flex justify-center">
-                            <div className="w-[8.5in] h-fit bg-white shadow-2xl origin-top scale-[0.7] -mt-16" data-resume-export="true">
+                        <div className="flex-1 overflow-y-auto p-8 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px] flex items-start justify-center">
+                            <div className="w-[8.5in] h-fit bg-white shadow-2xl origin-top scale-[0.85]" data-resume-export="true">
                                 <ResumePreview />
                             </div>
                         </div>

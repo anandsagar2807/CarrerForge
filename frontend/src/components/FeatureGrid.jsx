@@ -18,7 +18,7 @@ const FeatureGrid = () => {
       benefits: ["Auto-complete sections", "Smart formatting", "Industry templates"],
       gradient: "from-blue-600 to-cyan-600",
       bgGradient: "from-blue-50 to-cyan-50",
-      action: () => navigate('/templates'),
+      action: () => navigate('/sign-up'),
       actionText: "Start Building",
       badge: "Most Popular",
       badgeColor: "bg-blue-600"
@@ -30,7 +30,7 @@ const FeatureGrid = () => {
       benefits: ["Real-time scoring", "Keyword analysis", "Improvement tips"],
       gradient: "from-purple-600 to-pink-600",
       bgGradient: "from-purple-50 to-pink-50",
-      action: () => navigate('/analyze'),
+      action: () => navigate('/sign-up'),
       actionText: "Check Score",
       badge: "Free",
       badgeColor: "bg-green-600"
@@ -42,7 +42,7 @@ const FeatureGrid = () => {
       benefits: ["Smart matching", "Gap analysis", "Tailored content"],
       gradient: "from-green-600 to-emerald-600",
       bgGradient: "from-green-50 to-emerald-50",
-      action: () => navigate('/analyze'),
+      action: () => navigate('/sign-up'),
       actionText: "Try Matching",
       badge: "AI Powered",
       badgeColor: "bg-purple-600"
@@ -54,7 +54,7 @@ const FeatureGrid = () => {
       benefits: ["8+ templates", "Fully customizable", "ATS-friendly"],
       gradient: "from-orange-600 to-red-600",
       bgGradient: "from-orange-50 to-red-50",
-      action: () => navigate('/templates'),
+      action: () => navigate('/sign-up'),
       actionText: "View Templates",
       badge: "8+ Designs",
       badgeColor: "bg-orange-600"
@@ -66,7 +66,7 @@ const FeatureGrid = () => {
       benefits: ["24/7 available", "Expert advice", "Personalized tips"],
       gradient: "from-indigo-600 to-blue-600",
       bgGradient: "from-indigo-50 to-blue-50",
-      action: () => navigate('/chat'),
+      action: () => navigate('/sign-up'),
       actionText: "Chat Now",
       badge: "New",
       badgeColor: "bg-indigo-600"
@@ -78,7 +78,7 @@ const FeatureGrid = () => {
       benefits: ["AI-generated", "Job-specific", "Multiple tones"],
       gradient: "from-pink-600 to-rose-600",
       bgGradient: "from-pink-50 to-rose-50",
-      action: () => navigate('/cover-letter'),
+      action: () => navigate('/sign-up'),
       actionText: "Generate Letter",
       badge: "Time Saver",
       badgeColor: "bg-pink-600"
@@ -86,7 +86,7 @@ const FeatureGrid = () => {
   ];
 
   return (
-    <section className="py-20 md:py-32 relative overflow-hidden bg-gradient-to-b from-white to-slate-50">
+    <section id="powerful-features" className="py-20 md:py-32 pb-8 md:pb-12 relative overflow-hidden bg-gradient-to-b from-white to-slate-50">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-1/4 left-0 w-96 h-96 bg-blue-400 rounded-full blur-3xl" />
@@ -213,23 +213,6 @@ const FeatureGrid = () => {
           </div>
         </motion.div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-16 text-center"
-        >
-          <button
-            onClick={() => navigate('/templates')}
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/50 hover:shadow-xl hover:shadow-blue-500/60 transition-all duration-300 hover:scale-105"
-          >
-            <Sparkles className="h-5 w-5" />
-            Get Started for Free
-            <ArrowRight className="h-5 w-5" />
-          </button>
-          <p className="text-sm text-slate-600 mt-4">No credit card required • Free forever</p>
-        </motion.div>
       </div>
     </section>
   );

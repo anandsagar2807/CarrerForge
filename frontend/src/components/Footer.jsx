@@ -8,10 +8,10 @@ const Footer = () => {
 
   const footerLinks = {
     Product: [
-      { label: 'Templates', href: '/templates' },
+      { label: 'Templates', href: '/sign-up' },
       { label: 'Analyze Resume', href: '/analyze' },
-      { label: 'Pricing', href: '/#pricing' },
-      { label: 'Features', href: '/#features' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'Features', href: '/#powerful-features' },
     ],
     Company: [
       { label: 'About', href: '/#about' },

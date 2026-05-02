@@ -2,7 +2,6 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import TrustIndicators from '../components/TrustIndicators';
-import ProblemSolution from '../components/ProblemSolution';
 import FeatureGrid from '../components/FeatureGrid';
 import HowItWorks from '../components/HowItWorks';
 import Footer from '../components/Footer';
@@ -21,7 +20,6 @@ const LandingPage = () => {
       <main className="relative">
         <Hero />
         <TrustIndicators />
-        <ProblemSolution />
         <FeatureGrid />
         <HowItWorks />
       </main>

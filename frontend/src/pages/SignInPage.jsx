@@ -1,12 +1,11 @@
 import React from 'react';
-import { SignUp } from '@clerk/react';
+import { SignIn } from '@clerk/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, CheckCircle, Star, Zap, Target, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Sparkles, CheckCircle, Star } from 'lucide-react';
 
-const SignUpPage = () => {
+const SignInPage = () => {
   const navigate = useNavigate();
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 flex">
@@ -54,53 +53,33 @@ const SignUpPage = () => {
         >
           <div>
             <h2 className="text-3xl font-bold text-white mb-4">
-              Start building resumes
+              Welcome back to your
               <br />
-              that get you hired
+              career journey
             </h2>
             <p className="text-lg text-slate-300">
-              Join 50,000+ professionals who landed their dream jobs with our AI-powered platform.
+              Continue building resumes that get you hired at top companies.
             </p>
           </div>
 
           <div className="space-y-4">
             {[
-              { icon: Sparkles, text: '5 Advanced AI resume tools', color: 'text-purple-400' },
-              { icon: Target, text: 'ATS optimization & scoring', color: 'text-blue-400' },
-              { icon: Zap, text: 'Real-time feedback & suggestions', color: 'text-yellow-400' },
-              { icon: TrendingUp, text: 'Industry-specific tone matching', color: 'text-green-400' }
+              'AI-powered resume optimization',
+              'ATS-friendly templates',
+              'Real-time feedback & scoring',
+              'Export to PDF, DOC, TXT'
             ].map((feature, index) => (
               <motion.div
-                key={feature.text}
+                key={feature}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 + index * 0.1 }}
                 className="flex items-center gap-3"
               >
-                <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/20">
-                  <feature.icon className={`w-5 h-5 ${feature.color}`} />
+                <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
                 </div>
-                <span className="text-slate-200 font-medium">{feature.text}</span>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/10">
-            {[
-              { value: '50K+', label: 'Users' },
-              { value: '4.9', label: 'Rating' },
-              { value: '98%', label: 'ATS Pass' }
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 + index * 0.1 }}
-                className="text-center"
-              >
-                <p className="text-2xl font-bold text-white mb-1">{stat.value}</p>
-                <p className="text-xs text-slate-400">{stat.label}</p>
+                <span className="text-slate-200 font-medium">{feature}</span>
               </motion.div>
             ))}
           </div>
@@ -110,7 +89,7 @@ const SignUpPage = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.6 }}
           className="relative z-10"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -119,13 +98,12 @@ const SignUpPage = () => {
             ))}
           </div>
           <p className="text-slate-300 text-sm">
-            "Best resume builder I've used. Got 3 interviews in the first week!"
+            <span className="font-bold text-white">50,000+ professionals</span> have built their resumes with us
           </p>
-          <p className="text-slate-400 text-xs mt-2">— Sarah Chen, Software Engineer at Google</p>
         </motion.div>
       </div>
 
-      {/* Right Side - Sign Up Form */}
+      {/* Right Side - Sign In Form */}
       <div className="flex-1 flex items-center justify-center p-8 lg:p-12">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -150,30 +128,30 @@ const SignUpPage = () => {
             </div>
           </div>
 
-          {/* Sign Up Header */}
-          <div className="text-center mb-10">
+          {/* Sign In Header */}
+          <div className="text-center mb-12">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
               <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
-                Create your account
+                Welcome back
               </h2>
               <p className="text-lg text-slate-600 max-w-md mx-auto leading-relaxed">
-                Join thousands of professionals building resumes that get results
+                Sign in to continue building your professional resume
               </p>
             </motion.div>
           </div>
 
-          {/* Clerk Sign Up Component */}
+          {/* Clerk Sign In Component */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="flex justify-center"
           >
-            <SignUp
+            <SignIn
               appearance={{
                 elements: {
                   rootBox: 'w-full flex flex-col items-center',
@@ -184,8 +162,8 @@ const SignUpPage = () => {
                   socialButtonsBlockButtonText: 'font-bold text-base',
                   socialButtonsIconButton: 'border-2 border-slate-200 hover:border-blue-700 rounded-xl h-14 w-14',
                   formButtonPrimary: 'bg-gradient-to-r from-blue-700 to-blue-900 hover:shadow-xl hover:shadow-blue-900/30 text-white font-bold rounded-xl transition-all h-14 text-base',
-                  formFieldInput: 'w-full border-2 border-slate-200 rounded-xl focus:border-blue-700 focus:ring-4 focus:ring-blue-700/10 transition-all h-14 text-base px-5 bg-white',
-                  formFieldLabel: 'font-bold text-slate-700 text-base mb-2.5',
+                  formFieldInput: 'w-full border-2 border-slate-200 rounded-xl focus:border-blue-700 focus:ring-4 focus:ring-blue-700/10 transition-all h-14 text-base px-5 bg-white text-center',
+                  formFieldLabel: 'font-bold text-slate-700 text-base mb-2.5 text-center w-full',
                   footerActionLink: 'text-blue-700 hover:text-blue-900 font-bold text-base underline-offset-2',
                   identityPreviewText: 'font-bold text-base',
                   formResendCodeLink: 'text-blue-700 hover:text-blue-900 font-bold text-base',
@@ -201,7 +179,7 @@ const SignUpPage = () => {
                 }
               }}
               redirectUrl={window.location.origin + '/templates'}
-              signInUrl="/sign-in"
+              signUpUrl="/sign-up"
             />
           </motion.div>
 
@@ -212,17 +190,6 @@ const SignUpPage = () => {
             transition={{ delay: 0.4 }}
             className="mt-10"
           >
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-full">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <p className="text-sm text-green-700 font-bold">Free to start</p>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full">
-                <CheckCircle className="w-4 h-4 text-blue-600" />
-                <p className="text-sm text-blue-700 font-bold">No credit card</p>
-              </div>
-            </div>
-
             <div className="text-center">
               <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-4">Trusted by professionals from</p>
               <div className="flex items-center justify-center gap-8 flex-wrap">
@@ -240,4 +207,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default SignInPage;
