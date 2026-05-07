@@ -26,7 +26,7 @@
 
 **Files Modified/Created:**
 - `frontend/src/pages/TemplatesPage.jsx` (modified)
-- `frontend/src/components/TemplatePageHeader.jsx` (new)
+- `frontend/src/components/TemplatePageHeader.jsx` (new)(modified)
 
 ### 3. **Navbar Component**
 The existing Navbar component includes:
