@@ -6,6 +6,9 @@ import Footer from '../components/Footer';
 import { Upload, Sparkles, CheckCircle, AlertCircle, TrendingUp, ArrowRight, BarChart3, Target, Zap, Shield, Clock, Award, FileText, Users, Briefcase, GraduationCap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
 const Analyze = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -160,82 +163,175 @@ const Analyze = () => {
         fileInputRef.current?.click();
     };
 
-    const handleAnalyze = () => {
+    const handleAnalyze = async () => {
         if (!jobDescription.trim()) return;
 
         setIsAnalyzing(true);
-        setTimeout(() => {
-            const jdKeywords = extractKeywords(jobDescription);
-            const jdSkills = extractSkills(jobDescription);
-            const criticalKeywords = jdKeywords.slice(0, 30);
 
-            const found = criticalKeywords.filter((keyword) => resumeText.includes(keyword));
-            const missing = criticalKeywords.filter((keyword) => !resumeText.includes(keyword));
+        try {
+            const resumeText = [
+                resumeData.personalInfo.fullName,
+                resumeData.personalInfo.summary,
+                ...resumeData.skills.map((s) => s.name),
+                ...resumeData.experience.map((e) => `${e.position} at ${e.company}: ${e.description}`),
+                ...resumeData.education.map((e) => `${e.degree} in ${e.field} from ${e.institution}`),
+                ...resumeData.projects.map((p) => `${p.name}: ${p.description} ${(p.technologies || []).join(' ')}`),
+            ].join('. ');
 
-            const foundSkills = jdSkills.filter((skill) => resumeText.includes(skill.toLowerCase()));
-            const missingSkills = jdSkills.filter((skill) => !resumeText.includes(skill.toLowerCase()));
+            if (GROQ_API_KEY) {
+                // Use Groq API for dynamic analysis
+                const response = await fetch(GROQ_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${GROQ_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-70b-versatile',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `You are an expert ATS (Applicant Tracking System) analyzer. Analyze the resume against the job description and return a JSON response with the following structure:
+{
+  "score": <number 0-100>,
+  "foundKeywords": [<array of matching keywords>],
+  "missingKeywords": [<array of missing important keywords>],
+  "missingSkills": [<array of missing skills>],
+  "sectionScores": {
+    "skills": <number 0-100>,
+    "experience": <number 0-100>,
+    "education": <number 0-100>,
+    "keywords": <number 0-100>
+  },
+  "strengths": [<array of strength descriptions>],
+  "weaknesses": [<array of weakness descriptions>],
+  "suggestions": [<array of actionable suggestions>],
+  "industryName": "<detected industry>",
+  "atsCompliance": <boolean>
+}
+Be strict and realistic in scoring. Focus on keyword matching, skill alignment, and experience relevance.`
+                            },
+                            {
+                                role: 'user',
+                                content: `Resume:\n${resumeText}\n\nJob Description:\n${jobDescription}\n\nAnalyze this resume against the job description and provide ATS score and detailed feedback.`
+                            }
+                        ],
+                        temperature: 0.3,
+                        max_tokens: 2000
+                    })
+                });
 
-            const base = 100;
-            const missingPenalty = missing.length * 2.8;
-            const missingSkillsPenalty = missingSkills.length * 5;
-            const shortSummaryPenalty = (resumeData.personalInfo.summary || '').length < 80 ? 8 : 0;
-            const lowExperiencePenalty = resumeData.experience.length < 2 ? 7 : 0;
-            const lowSkillsPenalty = resumeData.skills.length < 8 ? 6 : 0;
+                if (!response.ok) throw new Error(`API error: ${response.status}`);
 
-            const experienceMatch = calculateExperienceMatch(jobDescription, resumeData.experience);
-            const experienceScore = Math.round(experienceMatch * 0.3);
+                const data = await response.json();
+                const content = data.choices[0]?.message?.content || '';
 
-            const strictScore = Math.max(28, Math.round(base - missingPenalty - missingSkillsPenalty - shortSummaryPenalty - lowExperiencePenalty - lowSkillsPenalty));
-            const finalScore = Math.min(100, Math.round((strictScore + experienceScore) / 1.3));
+                // Parse JSON response
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const analysisResult = JSON.parse(jsonMatch[0]);
 
-            const sectionScores = {
-                skills: Math.max(40, 100 - (missingSkills.length * 10)),
-                experience: experienceMatch,
-                education: resumeData.edducation?.length > 0 ? 100 : 60,
-                keywords: Math.max(30, 100 - (missing.length * 5))
-            };
+                    const detectedIndustry = analysisResult.industryName || detectIndustry(jobDescription);
+                    const benchmarkData = getIndustryBenchmark(detectedIndustry);
 
-            const strengths = [];
-            if (found.length > 15) strengths.push('Strong keyword matching');
-            if (resumeData.experience.length >= 2) strengths.push('Adequate work experience');
-            if (resumeData.skills.length >= 8) strengths.push('Good skill diversity');
-            if ((resumeData.personalInfo.summary || '').length >= 80) strengths.push('Well-written summary');
+                    setAnalysis({
+                        foundKeywords: analysisResult.foundKeywords.slice(0, 15),
+                        missingKeywords: analysisResult.missingKeywords.slice(0, 15),
+                        missingSkills: analysisResult.missingSkills || [],
+                        strictness: 'High',
+                        sectionScores: analysisResult.sectionScores,
+                        strengths: analysisResult.strengths,
+                        weaknesses: analysisResult.weaknesses,
+                        suggestions: analysisResult.suggestions,
+                        industryBenchmark: benchmarkData.average,
+                        industryName: detectedIndustry,
+                        industryAverage: benchmarkData.average,
+                        topPercentile: analysisResult.score >= benchmarkData.topPercentile,
+                        atsCompliance: analysisResult.atsCompliance
+                    });
+                    setScore(analysisResult.score);
+                } else {
+                    throw new Error('Invalid response format');
+                }
+            } else {
+                // Fallback to local analysis if no API key
+                const jdKeywords = extractKeywords(jobDescription);
+                const jdSkills = extractSkills(jobDescription);
+                const criticalKeywords = jdKeywords.slice(0, 30);
 
-            const weaknesses = [];
-            if (missing.length > 10) weaknesses.push('Missing critical keywords');
-            if (missingSkills.length > 0) weaknesses.push('Missing required skills');
-            if (resumeData.experience.length < 2) weaknesses.push('Limited work experience');
-            if ((resumeData.personalInfo.summary || '').length < 80) weaknesses.push('Summary needs improvement');
+                const found = criticalKeywords.filter((keyword) => resumeText.toLowerCase().includes(keyword));
+                const missing = criticalKeywords.filter((keyword) => !resumeText.toLowerCase().includes(keyword));
 
-            const suggestions = [];
-            if (missing.length > 0) suggestions.push(`Add these keywords: ${missing.slice(0, 5).join(', ')}`);
-            if (missingSkills.length > 0) suggestions.push(`Develop these skills: ${missingSkills.slice(0, 3).join(', ')}`);
-            if (resumeData.experience.length < 2) suggestions.push('Add more relevant work experience');
-            if ((resumeData.personalInfo.summary || '').length < 80) suggestions.push('Expand your professional summary');
+                const foundSkills = jdSkills.filter((skill) => resumeText.toLowerCase().includes(skill.toLowerCase()));
+                const missingSkills = jdSkills.filter((skill) => !resumeText.toLowerCase().includes(skill.toLowerCase()));
 
-            const detectedIndustry = detectIndustry(jobDescription);
-            const benchmarkData = getIndustryBenchmark(detectedIndustry);
+                const base = 100;
+                const missingPenalty = missing.length * 2.8;
+                const missingSkillsPenalty = missingSkills.length * 5;
+                const shortSummaryPenalty = (resumeData.personalInfo.summary || '').length < 80 ? 8 : 0;
+                const lowExperiencePenalty = resumeData.experience.length < 2 ? 7 : 0;
+                const lowSkillsPenalty = resumeData.skills.length < 8 ? 6 : 0;
 
-            setAnalysis({
-                foundKeywords: found.slice(0, 15),
-                missingKeywords: missing.slice(0, 15),
-                missingSkills: missingSkills.slice(0, 10),
-                strictness: 'High',
-                sectionScores,
-                strengths,
-                weaknesses,
-                suggestions,
-                industryBenchmark: benchmarkData.average,
-                industryName: detectedIndustry,
-                industryAverage: benchmarkData.average,
-                topPercentile: finalScore >= benchmarkData.topPercentile,
-                atsCompliance: missing.length < 10 && missingSkills.length < 3
-            });
+                const experienceMatch = calculateExperienceMatch(jobDescription, resumeData.experience);
+                const experienceScore = Math.round(experienceMatch * 0.3);
+
+                const strictScore = Math.max(28, Math.round(base - missingPenalty - missingSkillsPenalty - shortSummaryPenalty - lowExperiencePenalty - lowSkillsPenalty));
+                const finalScore = Math.min(100, Math.round((strictScore + experienceScore) / 1.3));
+
+                const sectionScores = {
+                    skills: Math.max(40, 100 - (missingSkills.length * 10)),
+                    experience: experienceMatch,
+                    education: resumeData.education?.length > 0 ? 100 : 60,
+                    keywords: Math.max(30, 100 - (missing.length * 5))
+                };
+
+                const strengths = [];
+                if (found.length > 15) strengths.push('Strong keyword matching');
+                if (resumeData.experience.length >= 2) strengths.push('Adequate work experience');
+                if (resumeData.skills.length >= 8) strengths.push('Good skill diversity');
+                if ((resumeData.personalInfo.summary || '').length >= 80) strengths.push('Well-written summary');
+
+                const weaknesses = [];
+                if (missing.length > 10) weaknesses.push('Missing critical keywords');
+                if (missingSkills.length > 0) weaknesses.push('Missing required skills');
+                if (resumeData.experience.length < 2) weaknesses.push('Limited work experience');
+                if ((resumeData.personalInfo.summary || '').length < 80) weaknesses.push('Summary needs improvement');
+
+                const suggestions = [];
+                if (missing.length > 0) suggestions.push(`Add these keywords: ${missing.slice(0, 5).join(', ')}`);
+                if (missingSkills.length > 0) suggestions.push(`Develop these skills: ${missingSkills.slice(0, 3).join(', ')}`);
+                if (resumeData.experience.length < 2) suggestions.push('Add more relevant work experience');
+                if ((resumeData.personalInfo.summary || '').length < 80) suggestions.push('Expand your professional summary');
+
+                const detectedIndustry = detectIndustry(jobDescription);
+                const benchmarkData = getIndustryBenchmark(detectedIndustry);
+
+                setAnalysis({
+                    foundKeywords: found.slice(0, 15),
+                    missingKeywords: missing.slice(0, 15),
+                    missingSkills: missingSkills.slice(0, 10),
+                    strictness: 'High',
+                    sectionScores,
+                    strengths,
+                    weaknesses,
+                    suggestions,
+                    industryBenchmark: benchmarkData.average,
+                    industryName: detectedIndustry,
+                    industryAverage: benchmarkData.average,
+                    topPercentile: finalScore >= benchmarkData.topPercentile,
+                    atsCompliance: missing.length < 10 && missingSkills.length < 3
+                });
+                setScore(finalScore);
+            }
+
             setJobDescription(jobDescription);
-            setScore(finalScore);
-            setIsAnalyzing(false);
             setShowResults(true);
-        }, 2500);
+        } catch (error) {
+            console.error('Error analyzing resume:', error);
+            alert('Failed to analyze resume. Please try again.');
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     const handleContinueToBuilder = () => {

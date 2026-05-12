@@ -178,7 +178,7 @@ const SignInPage = () => {
                   footerAction: 'mt-6',
                 }
               }}
-              redirectUrl={window.location.origin + '/templates'}
+              forceRedirectUrl="/templates"
               signUpUrl="/sign-up"
             />
           </motion.div>

@@ -34,6 +34,11 @@ const ClerkProviderWithNavigate = ({ children }) => {
             signInUrl="/sign-in"
             signUpUrl="/sign-up"
             navigate={(to) => navigate(to)}
+            appearance={{
+                variables: {
+                    colorPrimary: '#2563eb'
+                }
+            }}
         >
             {children}
         </ClerkProvider>
