@@ -11,6 +11,13 @@ exports.saveResume = async (req, res) => {
             template
         });
         await resume.save();
+
+        // Increment user's resume count
+        const User = require('../models/User');
+        await User.findByIdAndUpdate(req.user.id, {
+            $inc: { 'usage.resumesCreated': 1 }
+        });
+
         res.status(201).json(resume);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -20,7 +27,15 @@ exports.saveResume = async (req, res) => {
 exports.generatePDF = async (req, res) => {
     try {
         const { htmlContent } = req.body;
-        const pdfBuffer = await pdfService.generatePDF(htmlContent);
+
+        // Determine if user is Pro — Pro users get clean PDFs, free users get watermarked
+        const isPro = req.user && req.user.subscription.plan === 'pro' && req.user.subscription.status === 'active';
+
+        const pdfBuffer = await pdfService.generatePDF(htmlContent, {
+            addWatermark: !isPro,
+            userName: req.user ? req.user.name : ''
+        });
+
         res.contentType("application/pdf");
         res.send(pdfBuffer);
     } catch (err) {

@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   Target,
   TrendingUp,
-  Star,
   Users,
   Award,
   Clock,
@@ -24,6 +23,7 @@ import Testimonials from '../components/Testimonials';
 import Pricing from '../components/Pricing';
 import FAQ from '../components/FAQ';
 import PremiumFooter from '../components/PremiumFooter';
+import PremiumHeroShowcase from '../components/PremiumHeroShowcase';
 
 /* ─── Animation Variants ─── */
 const badgeVariants = {
@@ -34,10 +34,6 @@ const badgeVariants = {
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] } },
-};
-
-const floatVariants = {
-  animate: { y: [-6, 6, -6], transition: { duration: 6, repeat: Infinity, ease: 'easeInOut' } },
 };
 
 const staggerContainer = {
@@ -60,7 +56,7 @@ const HeroSection = () => {
   const ctaHref = isSignedIn ? '/analyze' : '/sign-up';
 
   return (
-    <section className="relative overflow-hidden min-h-[calc(100svh-80px)] flex items-center bg-[#F8FAFC]">
+    <section className="relative overflow-hidden min-h-screen flex items-center bg-[#F8FAFC]">
       {/* Background orbs */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-24 left-[-10%] h-[38rem] w-[38rem] rounded-full bg-[#7C3AED]/15 blur-[110px]" />
@@ -76,8 +72,8 @@ const HeroSection = () => {
         />
       </div>
 
-      <div className="relative z-10 section-container w-full">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center py-12 lg:py-0">
+      <div className="relative z-10 section-container w-full py-16 md:py-20">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center min-h-[calc(100vh-128px)] md:min-h-[calc(100vh-160px)]">
           {/* LEFT — Copy */}
           <div className="relative">
             <motion.div
@@ -201,115 +197,8 @@ const HeroSection = () => {
             </motion.div>
           </div>
 
-          {/* RIGHT — Interactive Resume Card */}
-          <div className="relative lg:pl-8">
-            <motion.div variants={floatVariants} animate="animate" className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-[#7C3AED]/20 to-[#4F46E5]/20 rounded-3xl blur-2xl" />
-              <div className="relative bg-white/95 backdrop-blur-xl p-8 rounded-3xl shadow-xl border border-slate-200">
-                {/* Profile header */}
-                <div className="flex items-center gap-5 mb-8">
-                  <div className="w-16 h-16 bg-gradient-to-br from-[#7C3AED] to-[#4F46E5] rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-lg">
-                    JD
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-[#0F172A]">Jessica Davidson</h3>
-                    <p className="text-sm font-medium text-[#7C3AED]">Engineering Manager</p>
-                  </div>
-                </div>
-
-                {/* Experience bars */}
-                <div className="space-y-5">
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">
-                        Experience
-                      </p>
-                      <span className="text-xs font-bold text-[#22C55E] bg-[#22C55E]/10 px-3 py-1 rounded-full">
-                        8+ Years
-                      </span>
-                    </div>
-                    <div className="space-y-2">
-                      {['100%', '92%', '85%'].map((width, i) => (
-                        <div key={i} className="h-2.5 bg-[#F8FAFC] rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width }}
-                            transition={{ duration: 1, delay: 0.8 + i * 0.1 }}
-                            className="h-full rounded-full bg-gradient-to-r from-[#7C3AED] to-[#4F46E5]"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Skills */}
-                  <div>
-                    <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider mb-3">
-                      Skills
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {['Product Strategy', 'React', 'Figma', 'Agile', 'Leadership'].map((skill, i) => (
-                        <motion.span
-                          key={skill}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.3, delay: 1.1 + i * 0.1 }}
-                          className="px-3 py-1.5 bg-[#F8FAFC] text-[#475569] text-xs font-semibold rounded-lg border border-[#E2E8F0]/60 shadow-sm"
-                        >
-                          {skill}
-                        </motion.span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-6 pt-5 border-t border-[#E2E8F0]/60 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 bg-[#22C55E] rounded-full animate-pulse" />
-                    <p className="text-xs font-medium text-[#475569]">Updated today</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className="w-4 h-4 text-[#EAB308] fill-[#EAB308]" />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Floating AI badge */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.4, duration: 0.5 }}
-              className="absolute -right-4 top-8 bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 flex items-center gap-3"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-[#7C3AED] to-[#4F46E5] rounded-xl flex items-center justify-center">
-                <Bot className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-[#0F172A]">AI Optimized</p>
-                <p className="text-[10px] text-[#64748B]">3 improvements applied</p>
-              </div>
-            </motion.div>
-
-            {/* Floating ATS badge */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.6, duration: 0.5 }}
-              className="absolute -left-4 bottom-12 bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 flex items-center gap-3"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center">
-                <ShieldCheck className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-[#0F172A]">ATS Passed</p>
-                <p className="text-[10px] text-[#64748B]">All keywords matched</p>
-              </div>
-            </motion.div>
-          </div>
+          {/* RIGHT — Premium Hero Showcase */}
+          <PremiumHeroShowcase />
         </div>
       </div>
     </section>

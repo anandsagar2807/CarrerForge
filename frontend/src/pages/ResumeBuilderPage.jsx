@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useResume } from '../context/ResumeContext';
+import { useAuth } from '../context/AuthContext';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import {
     Upload, FileText, Briefcase, GraduationCap, Code,
     Award, Download, Eye, Save, Sparkles, ChevronLeft,
     Plus, Trash2, MapPin, Mail, Phone, Link as LinkIcon,
-    Linkedin, Github, ExternalLink, Trash, Loader
+    Linkedin, Github, ExternalLink, Trash, Loader,
+    Crown, Lock, AlertCircle
 } from 'lucide-react';
 import ResumePreview from '../components/ResumePreview';
 
 const ResumeBuilderPage = () => {
     const { templateId } = useParams();
     const navigate = useNavigate();
+    const { user, isPro, isAuthenticated } = useAuth();
     const {
         resumeData,
         selectedTemplate,
@@ -235,6 +238,19 @@ const ResumeBuilderPage = () => {
         if (!resumeElement) {
             alert('Resume preview not found');
             return;
+        }
+
+        // Show watermark notice for free users
+        if (!isPro()) {
+            const confirmed = window.confirm(
+                '⚠️ Free Plan Notice: Your PDF will include a "ResumeForge Pro" watermark.\n\n' +
+                'Upgrade to Pro for clean, watermark-free PDFs and premium templates.\n\n' +
+                'Click OK to continue with watermark, or Cancel to upgrade.'
+            );
+            if (!confirmed) {
+                navigate('/pricing');
+                return;
+            }
         }
 
         // Try backend PDF first, then fallback to client-side PDF generation.
@@ -921,11 +937,10 @@ const ResumeBuilderPage = () => {
                                                 <span className="text-xl">{suggestion.icon}</span>
                                                 <span className="text-sm text-slate-700 font-semibold flex-1">{suggestion.text}</span>
                                                 {suggestion.priority && (
-                                                    <span className={`text-xs font-bold px-2 py-1 rounded ${
-                                                        suggestion.priority === 'Critical' ? 'bg-red-100 text-red-700' :
+                                                    <span className={`text-xs font-bold px-2 py-1 rounded ${suggestion.priority === 'Critical' ? 'bg-red-100 text-red-700' :
                                                         suggestion.priority === 'High' ? 'bg-orange-100 text-orange-700' :
-                                                        'bg-blue-100 text-blue-700'
-                                                    }`}>
+                                                            'bg-blue-100 text-blue-700'
+                                                        }`}>
                                                         {suggestion.priority}
                                                     </span>
                                                 )}

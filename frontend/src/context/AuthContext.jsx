@@ -30,15 +30,42 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    try {
+      const updatedUser = await authService.fetchCurrentUser();
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+    } catch (err) {
+      console.error('Failed to refresh user:', err);
+    }
+  };
+
+  const isPro = () => {
+    return user?.subscription?.plan === 'pro' && user?.subscription?.status === 'active';
+  };
+
+  const isFree = () => {
+    return !isPro();
+  };
+
+  const hasPremiumTemplates = () => {
+    return isPro() || user?.subscription?.features?.premiumTemplates === true;
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
         loading,
         isAuthenticated: !!user,
+        isPro,
+        isFree,
+        hasPremiumTemplates,
         login,
         register,
         logout,
+        refreshUser,
       }}
     >
       {children}

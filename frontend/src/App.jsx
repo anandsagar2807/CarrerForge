@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ResumeProvider } from './context/ResumeContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { AIToolsProvider } from './context/AIToolsContext';
+import { AuthProvider } from './context/AuthContext';
 import FloatingAIAssistant from './components/FloatingAIAssistant';
 
 // Lazy-loaded pages for instant routing and smaller initial bundle
@@ -24,6 +25,7 @@ const FinalPolishReview = lazy(() => import('./pages/FinalPolishReview'));
 const SignInPage = lazy(() => import('./pages/SignInPage'));
 const SignUpPage = lazy(() => import('./pages/SignUpPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
+const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
 const SSOCallback = lazy(() => import('./pages/SSOCallback'));
 
 // Premium page transition variants
@@ -52,20 +54,20 @@ const PageLoader = () => (
 );
 
 const ClerkProviderWithNavigate = ({ children }) => {
-    const navigate = useNavigate();
-    return (
-        <ClerkProvider
-            publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
-            afterSignUpUrl="/templates"
-            afterSignInUrl="/templates"
-            afterSignOutUrl="/"
-            signInUrl="/sign-in"
-            signUpUrl="/sign-up"
-            navigate={(to) => navigate(to)}
-        >
-            {children}
-        </ClerkProvider>
-    );
+  const navigate = useNavigate();
+  return (
+    <ClerkProvider
+      publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+      afterSignUpUrl="/templates"
+      afterSignInUrl="/templates"
+      afterSignOutUrl="/"
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      navigate={(to) => navigate(to)}
+    >
+      {children}
+    </ClerkProvider>
+  );
 };
 
 // Animated routes wrapper with AnimatePresence for seamless transitions
@@ -101,6 +103,7 @@ const AnimatedRoutes = () => {
             <Route path="/sign-in/*" element={<SignInPage />} />
             <Route path="/sign-up/*" element={<SignUpPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/success" element={<PaymentSuccessPage />} />
             <Route path="/sso-callback" element={<SSOCallback />} />
           </Routes>
         </Suspense>
@@ -110,20 +113,22 @@ const AnimatedRoutes = () => {
 };
 
 function App() {
-    return (
-        <ThemeProvider>
-            <ResumeProvider>
-                <AIToolsProvider>
-                    <Router>
-                        <ClerkProviderWithNavigate>
-                            <AnimatedRoutes />
-                            <FloatingAIAssistant />
-                        </ClerkProviderWithNavigate>
-                    </Router>
-                </AIToolsProvider>
-            </ResumeProvider>
-        </ThemeProvider>
-    );
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <ResumeProvider>
+          <AIToolsProvider>
+            <Router>
+              <ClerkProviderWithNavigate>
+                <AnimatedRoutes />
+                <FloatingAIAssistant />
+              </ClerkProviderWithNavigate>
+            </Router>
+          </AIToolsProvider>
+        </ResumeProvider>
+      </AuthProvider>
+    </ThemeProvider>
+  );
 }
 
 export default App;

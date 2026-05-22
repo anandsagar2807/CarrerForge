@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, FileCheck, Target, Download, Shield, Zap, Sparkles, Wand2, Clock, Lock, Palette, Globe } from 'lucide-react';
+import { Search, FileCheck, Target, Download, Shield, Zap, Sparkles, Wand2, Clock, Lock, Palette, Globe, Crown, Check, X as XIcon } from 'lucide-react';
 
 const features = [
   {
@@ -40,6 +40,17 @@ const features = [
   },
 ];
 
+const comparisonFeatures = [
+  { name: 'Resume Templates', free: '4 free templates', pro: 'All 8+ templates including premium', icon: Palette },
+  { name: 'AI Generations', free: '5 per month', pro: 'Unlimited', icon: Wand2 },
+  { name: 'PDF Export', free: 'With watermark', pro: 'Clean, no watermark', icon: Download },
+  { name: 'ATS Scans', free: '10 per month', pro: 'Unlimited', icon: Search },
+  { name: 'Premium Templates', free: 'Locked', pro: 'Full access (Corporate, Creative, Executive, Tech)', icon: Crown },
+  { name: 'Priority Support', free: 'Email only', pro: 'Priority chat & email', icon: Shield },
+  { name: 'Custom Branding', free: 'Not available', pro: 'Add your logo & colors', icon: Globe },
+  { name: 'Resumes Created', free: '3 maximum', pro: 'Unlimited', icon: FileCheck },
+];
+
 const FeatureCard = ({ feature, index }) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
@@ -64,6 +75,42 @@ const FeatureCard = ({ feature, index }) => (
     </div>
   </motion.div>
 );
+
+const ComparisonRow = ({ feature, index }) => {
+  const Icon = feature.icon;
+  const isFreeLocked = feature.free === 'Locked' || feature.free === 'Not available' || feature.free === 'With watermark';
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+      className={`flex items-center gap-4 py-4 px-6 rounded-xl ${index % 2 === 0 ? 'bg-slate-50' : 'bg-white'} hover:bg-blue-50/50 transition-colors`}
+    >
+      <div className="flex items-center gap-3 min-w-[200px]">
+        <div className="w-8 h-8 bg-gradient-to-br from-blue-700 to-blue-900 rounded-lg flex items-center justify-center shadow-sm">
+          <Icon className="w-4 h-4 text-white" />
+        </div>
+        <span className="font-semibold text-slate-900 text-sm">{feature.name}</span>
+      </div>
+      <div className="flex-1 flex items-center justify-between gap-4">
+        <div className={`flex items-center gap-2 text-sm ${isFreeLocked ? 'text-slate-400' : 'text-slate-600'}`}>
+          {isFreeLocked ? (
+            <XIcon className="w-4 h-4 text-red-400" />
+          ) : (
+            <Check className="w-4 h-4 text-slate-500" />
+          )}
+          <span>{feature.free}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-blue-700 font-medium">
+          <Check className="w-4 h-4 text-blue-600" />
+          <span>{feature.pro}</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 const Features = () => {
   return (
@@ -114,6 +161,79 @@ const Features = () => {
           <FeatureCard key={feature.title} feature={feature} index={index} />
         ))}
       </div>
+
+      {/* Free vs Pro Comparison Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="mt-20"
+      >
+        <div className="text-center mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-amber-50 border border-blue-200 rounded-full mb-6"
+          >
+            <Crown className="w-4 h-4 text-amber-600" />
+            <span className="text-sm font-bold text-slate-700">
+              Free vs Pro Comparison
+            </span>
+          </motion.div>
+
+          <h3 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            See what you get with <span className="text-blue-800">Pro</span>
+          </h3>
+          <p className="text-slate-500 text-lg">
+            Upgrade to unlock all premium features and take your resume to the next level.
+          </p>
+        </div>
+
+        {/* Comparison Table */}
+        <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-lg overflow-hidden">
+          {/* Table Header */}
+          <div className="flex items-center gap-4 py-5 px-6 bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200">
+            <div className="min-w-[200px]">
+              <span className="font-bold text-slate-900">Feature</span>
+            </div>
+            <div className="flex-1 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-600">Free</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-gradient-to-br from-blue-700 to-blue-900 rounded-lg flex items-center justify-center">
+                  <Crown className="w-3.5 h-3.5 text-white" />
+                </div>
+                <span className="font-bold text-blue-800">Pro</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Table Rows */}
+          <div className="divide-y divide-slate-100">
+            {comparisonFeatures.map((feature, index) => (
+              <ComparisonRow key={feature.name} feature={feature} index={index} />
+            ))}
+          </div>
+
+          {/* Upgrade CTA */}
+          <div className="py-6 px-6 bg-gradient-to-r from-blue-50 to-blue-100/50 border-t border-slate-200 text-center">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => window.location.href = '/pricing'}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-900 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <Crown className="w-5 h-5" />
+              Upgrade to Pro — $12/month
+              <Zap className="w-4 h-4" />
+            </motion.button>
+            <p className="text-slate-500 text-sm mt-3">7-day free trial • Cancel anytime • No credit card required to start</p>
+          </div>
+        </div>
+      </motion.div>
     </section>
   );
 };

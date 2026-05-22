@@ -4,10 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Filter, Check, Sparkles, Eye, X, ChevronLeft, ChevronRight,
   Loader2, Grid, LayoutGrid, Star, Zap, Briefcase, User, Code,
-  Home, ArrowRight, MessageSquare, FileText, Search, BarChart3
+  Home, ArrowRight, MessageSquare, FileText, Search, BarChart3,
+  Lock, Crown
 } from 'lucide-react';
 import groqTemplatesService, { templateStyles } from '../services/groqTemplates';
 import { useResume } from '../context/ResumeContext';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import TemplatePageHeader from '../components/TemplatePageHeader';
 import Footer from '../components/Footer';
@@ -32,6 +34,7 @@ const templateComponents = {
 const TemplatesPage = () => {
   const navigate = useNavigate();
   const { setTemplate, updateResumeData } = useResume();
+  const { user, isPro, isAuthenticated } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [previewTemplate, setPreviewTemplate] = useState(null);
@@ -141,6 +144,13 @@ const TemplatesPage = () => {
   };
 
   const handleTemplateSelect = async (templateId, userInput = {}) => {
+    // Check if template is premium and user is not Pro
+    const templateStyle = templateStyles[templateId];
+    if (templateStyle?.premium && !isPro()) {
+      navigate('/pricing');
+      return;
+    }
+
     try {
       setIsRouting(true);
       setTemplate(templateId);
@@ -156,6 +166,12 @@ const TemplatesPage = () => {
   };
 
   const openCustomizationModal = (templateId) => {
+    // Check if template is premium and user is not Pro
+    const templateStyle = templateStyles[templateId];
+    if (templateStyle?.premium && !isPro()) {
+      navigate('/pricing');
+      return;
+    }
     setSelectedTemplateForCustomization(templateId);
     setShowCustomizationModal(true);
   };
@@ -176,6 +192,12 @@ const TemplatesPage = () => {
   };
 
   const handleUseTemplate = (templateId) => {
+    // Check if template is premium and user is not Pro
+    const templateStyle = templateStyles[templateId];
+    if (templateStyle?.premium && !isPro()) {
+      navigate('/pricing');
+      return;
+    }
     openCustomizationModal(templateId);
   };
 
@@ -353,6 +375,9 @@ const TemplatesPage = () => {
 const TemplateCard = ({ template, resumeData, onPreview, onSelect, isSelected, onSelectChange }) => {
   const TemplateComponent = template.TemplateComponent;
   const [isHovered, setIsHovered] = useState(false);
+  const { isPro, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const isLocked = template.premium && !isPro();
 
   return (
     <motion.div
@@ -362,18 +387,23 @@ const TemplateCard = ({ template, resumeData, onPreview, onSelect, isSelected, o
       exit={{ opacity: 0, y: -20 }}
       className={`group relative bg-white rounded-2xl overflow-hidden border-2 transition-all duration-300 ${isSelected
         ? 'border-blue-500 shadow-xl shadow-blue-500/20'
-        : 'border-slate-200 hover:border-blue-300 hover:shadow-xl'
+        : isLocked
+          ? 'border-amber-200 hover:border-amber-300'
+          : 'border-slate-200 hover:border-blue-300 hover:shadow-xl'
         }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onSelectChange(template.id)}
+      onClick={() => !isLocked && onSelectChange(template.id)}
     >
       {/* Premium Badge */}
       {template.premium && (
         <div className="absolute top-3 right-3 z-10">
-          <span className="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1">
-            <Star className="h-3 w-3 fill-current" />
-            PREMIUM
+          <span className={`px-3 py-1 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1 ${isLocked
+            ? 'bg-gradient-to-r from-amber-500 to-amber-600'
+            : 'bg-gradient-to-r from-green-500 to-green-600'
+            }`}>
+            {isLocked ? <Lock className="h-3 w-3" /> : <Crown className="h-3 w-3" />}
+            {isLocked ? 'PREMIUM' : 'UNLOCKED'}
           </span>
         </div>
       )}
@@ -381,37 +411,60 @@ const TemplateCard = ({ template, resumeData, onPreview, onSelect, isSelected, o
       {/* Template Preview Thumbnail */}
       <div className="aspect-[3/4] bg-white relative overflow-hidden">
         {TemplateComponent && resumeData && (
-          <div className="absolute inset-0 origin-top-left scale-[0.25]">
+          <div className={`absolute inset-0 origin-top-left scale-[0.25] ${isLocked ? 'blur-[2px]' : ''}`}>
             <TemplateComponent data={resumeData} scale={1} isPreview />
           </div>
         )}
 
-        {/* Hover Overlay */}
-        <div className={`absolute inset-0 bg-slate-900/80 flex items-center justify-center transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'
-          }`}>
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onPreview(template.id);
-              }}
-              className="flex items-center gap-2 bg-white text-slate-900 font-semibold py-3 px-6 rounded-xl hover:bg-slate-100 transition-colors"
-            >
-              <Eye className="h-5 w-5" />
-              Full Preview
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelect(template.id);
-              }}
-              className="flex items-center gap-2 bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-700 transition-colors"
-            >
-              <Sparkles className="h-5 w-5" />
-              Use Template
-            </button>
+        {/* Premium Lock Overlay (always visible for locked templates) */}
+        {isLocked && (
+          <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center z-10">
+            <div className="text-center">
+              <Lock className="h-8 w-8 text-amber-400 mx-auto mb-2" />
+              <p className="text-white font-bold text-sm mb-1">Premium Template</p>
+              <p className="text-slate-300 text-xs mb-3">Upgrade to Pro to unlock</p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/pricing');
+                }}
+                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold py-2 px-4 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-colors text-sm"
+              >
+                <Crown className="h-4 w-4" />
+                Upgrade to Pro
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Hover Overlay (only for unlocked templates) */}
+        {!isLocked && (
+          <div className={`absolute inset-0 bg-slate-900/80 flex items-center justify-center transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'
+            }`}>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPreview(template.id);
+                }}
+                className="flex items-center gap-2 bg-white text-slate-900 font-semibold py-3 px-6 rounded-xl hover:bg-slate-100 transition-colors"
+              >
+                <Eye className="h-5 w-5" />
+                Full Preview
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect(template.id);
+                }}
+                className="flex items-center gap-2 bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl hover:bg-blue-700 transition-colors"
+              >
+                <Sparkles className="h-5 w-5" />
+                Use Template
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Template Info */}
@@ -436,16 +489,29 @@ const TemplateCard = ({ template, resumeData, onPreview, onSelect, isSelected, o
 
       {/* Use Button */}
       <div className="px-5 pb-5 pt-0">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelect(template.id);
-          }}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
-        >
-          <Sparkles className="h-4 w-4" />
-          Use This Template
-        </button>
+        {isLocked ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate('/pricing');
+            }}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-md hover:shadow-lg"
+          >
+            <Crown className="h-4 w-4" />
+            Upgrade to Pro
+          </button>
+        ) : (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect(template.id);
+            }}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
+          >
+            <Sparkles className="h-4 w-4" />
+            Use This Template
+          </button>
+        )}
       </div>
     </motion.div>
   );

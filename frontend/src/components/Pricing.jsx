@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Sparkles, ArrowRight } from 'lucide-react';
+import { Check, Sparkles, ArrowRight, Lock, Crown, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { paymentService } from '../services/paymentService';
 
 const plans = [
   {
@@ -62,6 +64,73 @@ const plans = [
 
 const PricingCard = ({ plan, index }) => {
   const navigate = useNavigate();
+  const { user, isPro, isAuthenticated } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [currentPlan, setCurrentPlan] = useState(false);
+
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.subscription) {
+      const userPlan = user.subscription.plan;
+      if (plan.name.toLowerCase() === userPlan || (plan.name === 'Pro' && userPlan === 'pro')) {
+        setCurrentPlan(true);
+      }
+    }
+  }, [isAuthenticated, user, plan.name]);
+
+  const handleCheckout = async () => {
+    if (!isAuthenticated) {
+      navigate('/sign-up');
+      return;
+    }
+
+    if (plan.name === 'Free') {
+      navigate('/templates');
+      return;
+    }
+
+    if (plan.name === 'Enterprise') {
+      navigate('/sign-up');
+      return;
+    }
+
+    // Pro plan - initiate Stripe checkout
+    setLoading(true);
+    setError(null);
+    try {
+      const session = await paymentService.createCheckoutSession('pro');
+      if (session.url) {
+        window.location.href = session.url;
+      } else if (session.sessionId) {
+        // Redirect to Stripe hosted checkout
+        const stripeUrl = `https://checkout.stripe.com/c/pay/${session.sessionId}`;
+        window.location.href = stripeUrl;
+      }
+    } catch (err) {
+      console.error('Checkout session error:', err);
+      setError(err.response?.data?.message || 'Failed to start checkout. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  if (showSuccess) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="absolute inset-0 bg-green-50/95 backdrop-blur-sm rounded-3xl flex items-center justify-center z-20"
+      >
+        <div className="text-center">
+          <Crown className="w-12 h-12 text-green-600 mx-auto mb-3" />
+          <h3 className="text-xl font-bold text-green-800">You're now Pro!</h3>
+          <p className="text-green-600">All premium features unlocked</p>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -111,19 +180,48 @@ const PricingCard = ({ plan, index }) => {
           ))}
         </ul>
 
+        {/* Current plan indicator */}
+        {currentPlan && (
+          <div className="flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-green-50 border-2 border-green-200 text-green-700 font-bold text-base">
+            <Check className="w-5 h-5" />
+            Current Plan
+          </div>
+        )}
+
+        {/* Error message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center">
+            {error}
+          </div>
+        )}
+
         {/* CTA Button */}
-        <motion.button
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/templates')}
-          className={`w-full py-4 px-6 rounded-2xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 group/btn ${plan.popular
-            ? 'bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg hover:shadow-xl'
-            : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
-            }`}
-        >
-          {plan.cta}
-          <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-        </motion.button>
+        {!currentPlan && (
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleCheckout}
+            disabled={loading}
+            className={`w-full py-4 px-6 rounded-2xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 group/btn ${loading
+              ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+              : plan.popular
+                ? 'bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg hover:shadow-xl'
+                : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
+              }`}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                {plan.cta}
+                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+              </>
+            )}
+          </motion.button>
+        )}
       </div>
     </motion.div>
   );
