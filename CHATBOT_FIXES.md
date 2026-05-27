@@ -1,5 +1,4 @@
 # Chatbot Fixes - April 27, 2026
-
 ## Issues Fixed
 
 ### 1. Auto-Redirect to Header Issue ✅
@@ -7,8 +6,6 @@
 
 **Solution**: Modified the scroll behavior in the `useEffect` hook to only scroll within the messages container, not the entire page.
 The `block: 'nearest'` parameter ensures the scroll only happens within the chat container, preventing the page from jumping to the top.
-
----
 
 ### 2. Conversational Responses Without Asterisks ✅
 **Problem**: Chatbot responses included asterisks (*) and markdown formatting, making it look robotic instead of conversational.
