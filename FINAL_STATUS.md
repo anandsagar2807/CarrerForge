@@ -9,7 +9,7 @@ Your **ResumeForge Pro** is now a complete, professional, premium full-stack app
 ## 🌐 LIVE APPLICATION
 
 ### Current Running Status:
-- ✅ **Frontend**: http://localhost:3006
+- ✅ **Frontend**: http://localhost:3000
 - ✅ **Backend**: http://localhost:5000  
 - ✅ **Database**: MongoDB Atlas Connected
 - ✅ **Health Check**: Working
