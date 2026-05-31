@@ -8,33 +8,35 @@ Your **ResumeForge Pro** is now a complete, professional, premium full-stack app
 
 ## 🌐 LIVE APPLICATION
 
-### Current Running Status:
+### Current Running Status (Local Development)
 - ✅ **Frontend**: http://localhost:3000
-- ✅ **Backend**: http://localhost:5000  
+- ✅ **Backend**: http://localhost:5000
 - ✅ **Database**: MongoDB Atlas Connected
 - ✅ **Health Check**: Working
+
+> Note: The URLs above are for local development. In production you’ll use your deployed Vercel/Render (or Railway) URLs.
 
 ---
 
 ## 🎨 WHAT'S BEEN TRANSFORMED
 
-### 1. **Premium Light Theme** ✅
+### 1) Premium Light Theme ✅
 - ❌ Removed all dark mode functionality
 - ✅ Professional light theme with warm beige background
 - ✅ Modern glass morphism effects
 - ✅ Clean, premium design
 - ✅ Consistent color scheme (Indigo + Purple)
 
-### 2. **NEW PREMIUM FEATURES ADDED** ✅
+### 2) New Premium Features Added ✅
 
-#### 🤖 AI Resume Bullet Rewriter
+#### AI Resume Bullet Rewriter
 - **Location**: `/analyze` → Bullet Rewriter tab
 - Transforms weak bullet points into impactful statements
 - Uses XYZ formula for results-driven content
 - Keyword optimization
 - One-click copy to clipboard
 
-#### 📊 Advanced ATS Score Checker  
+#### Advanced ATS Score Checker
 - **Location**: `/analyze` → ATS Score Checker tab
 - Comprehensive resume vs job description analysis
 - Section-by-section scoring (Skills, Experience, Education, Keywords)
@@ -43,14 +45,14 @@ Your **ResumeForge Pro** is now a complete, professional, premium full-stack app
 - Strengths & weaknesses breakdown
 - Actionable improvement suggestions
 
-#### 💼 Interview Preparation Tool
-- **Location**: `/interview-prep` (new page)
+#### Interview Preparation Tool
+- **Location**: `/interview-prep`
 - Generates role-specific interview questions
 - Behavioral, technical, and situational questions
 - Answer tips and frameworks
 - Company-specific customization
 
-#### 🎯 Enhanced Navigation
+#### Enhanced Navigation
 - Added "Interview Prep" to main menu
 - Removed "Pricing" link
 - Clean, professional structure
@@ -59,7 +61,7 @@ Your **ResumeForge Pro** is now a complete, professional, premium full-stack app
 
 ## 🚀 ALL FEATURES WORKING
 
-### Core Features:
+### Core Features
 1. ✅ **8 Professional Resume Templates**
    - Modern, ATS, Creative, Executive, Minimalist, Tech, Compact, Professional
 
@@ -98,64 +100,46 @@ Your **ResumeForge Pro** is now a complete, professional, premium full-stack app
 ## 🔧 TECHNICAL STACK
 
 ### Frontend
-```
-✅ React 18.2.0
-✅ Vite 4.5.14
-✅ TailwindCSS 3.3.5
-✅ Framer Motion 10.16.4
-✅ React Router 6.20.0
-✅ Lucide Icons
-✅ Axios
-```
+- ✅ React 18.2.0
+- ✅ Vite 4.5.x
+- ✅ TailwindCSS 3.x
+- ✅ Framer Motion 10.x
+- ✅ React Router 6.x
+- ✅ Lucide Icons
+- ✅ Axios
 
 ### Backend
-```
-✅ Node.js + Express 5.2.1
-✅ MongoDB + Mongoose 9.4.1
-✅ Groq API (llama-3.1-70b)
-✅ Puppeteer (PDF generation)
-✅ JWT Authentication
-✅ Stripe Integration
-✅ CORS enabled
-✅ Rate limiting
-```
+- ✅ Node.js + Express
+- ✅ MongoDB + Mongoose
+- ✅ Groq API (llama-3.1-70b)
+- ✅ Puppeteer (PDF generation)
+- ✅ JWT Authentication
+- ✅ Stripe Integration (optional)
+- ✅ CORS enabled
+- ✅ Rate limiting
 
 ### Database
-```
-✅ MongoDB Atlas
-✅ Connection Active
-✅ Collections: Users, Resumes
-```
+- ✅ MongoDB Atlas
+- ✅ Connection Active
+- ✅ Collections: Users, Resumes
 
 ---
 
 ## 📦 DEPLOYMENT READY
 
-### Quick Deploy Steps:
+Deployment steps are documented in **`DEPLOYMENT.md`**.
 
-#### 1. **Frontend → Vercel** (Free)
-```bash
-1. Push to GitHub
-2. Import to Vercel
-3. Root directory: frontend
-4. Add env: VITE_API_URL=<backend-url>
-5. Deploy
-```
+### Recommended hosting
+- **Frontend**: Vercel
+- **Backend**: Render (or Railway)
+- **Database**: MongoDB Atlas
 
-#### 2. **Backend → Render** (Free)
-```bash
-1. Import to Render
-2. Root directory: server
-3. Add all environment variables
-4. Deploy
-```
+### Environment variables (standardized)
+To match `DEPLOYMENT.md`, standardize on:
+- Backend: `MONGODB_URI` (not `MONGO_URI`)
+- Frontend: `VITE_API_BASE_URL` (not `VITE_API_URL`)
 
-#### 3. **Database** (Already Setup)
-```
-✅ MongoDB Atlas configured
-✅ Connection string ready
-✅ No additional setup needed
-```
+If your existing code still expects the older names, set both variables in production until you update the code.
 
 ---
 
@@ -179,7 +163,7 @@ All pages are working and accessible:
 4. **/builder** - Interactive resume builder
 5. **/cover-letter** - AI cover letter generator
 6. **/chat** - AI career assistant
-7. **/interview-prep** - Interview question generator (NEW!)
+7. **/interview-prep** - Interview question generator
 
 ---
 
@@ -204,9 +188,9 @@ All pages are working and accessible:
 
 ---
 
-## 🎊 FINAL STATUS
+## ✅ FINAL STATUS
 
-### ✅ COMPLETED:
+### Completed
 - [x] Dark theme removed
 - [x] Premium light theme implemented
 - [x] All components working
@@ -218,34 +202,10 @@ All pages are working and accessible:
 - [x] Documentation complete
 - [x] Ready for deployment
 
-### 🚀 READY TO DEPLOY:
-Your application is **100% production-ready** and can be deployed online immediately!
+### Next step: Deploy online
+Follow **`DEPLOYMENT.md`** to deploy to:
+- Vercel (Frontend)
+- Render/Railway (Backend)
+- MongoDB Atlas (Database)
 
----
-
-## 📞 NEXT STEP: DEPLOY ONLINE
-
-Follow the `DEPLOYMENT.md` guide to deploy your application to:
-- **Vercel** (Frontend)
-- **Render** (Backend)
-- **MongoDB Atlas** (Database - already configured)
-
-**Estimated deployment time: 15-20 minutes**
-
----
-
-## 🎉 CONGRATULATIONS!
-
-Your **ResumeForge Pro** is now:
-- ✅ Professional & Premium
-- ✅ Fully Functional
-- ✅ Backend Connected
-- ✅ AI-Powered
-- ✅ Production Ready
-- ✅ Ready to Deploy Online
-
-**Open http://localhost:3006 in your browser to see your amazing application!**
-
----
-
-**Built with ❤️ - Your application is ready to go live! 🚀**
+**Estimated deployment time: 15–20 minutes**
