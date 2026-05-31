@@ -2,7 +2,7 @@ import React from 'react';
 
 const ProfessionalTemplate = ({ data, scale = 1, isPreview = false }) => {
   const { personalInfo, summary, experience, skills, education, achievements } = data;
-  
+
   const containerStyle = {
     transform: `scale(${scale})`,
     transformOrigin: 'top left',
@@ -62,6 +62,15 @@ const ProfessionalTemplate = ({ data, scale = 1, isPreview = false }) => {
     marginBottom: '14px'
   };
 
+  const dividerStyle = {
+    borderBottom: '1px solid #cccccc',
+    marginTop: '10px',
+    marginBottom: '10px',
+    marginLeft: '35px',
+    marginRight: '35px',
+    width: 'calc(100% - 70px)'
+  };
+
   const contentStyle = {
     fontSize: '10px',
     color: '#334155'
@@ -93,30 +102,27 @@ const ProfessionalTemplate = ({ data, scale = 1, isPreview = false }) => {
     paddingLeft: '10px'
   };
 
-  return (
-    <div style={containerStyle} className="professional-template">
-      {/* Header */}
-      <div style={headerStyle}>
-        <h1 style={nameStyle}>{personalInfo?.name || 'Your Name'}</h1>
-        <p style={titleStyle}>{personalInfo?.title || 'Professional Title'}</p>
-        <div style={contactStyle}>
-          {personalInfo?.email && <span>{personalInfo.email}</span>}
-          {personalInfo?.phone && <span>{personalInfo.phone}</span>}
-          {personalInfo?.location && <span>{personalInfo.location}</span>}
-          {personalInfo?.linkedin && <span>{personalInfo.linkedin}</span>}
-        </div>
-      </div>
+  // Build visible sections array
+  const sections = [];
 
-      {/* Summary */}
-      {summary && (
+  // Summary
+  if (summary) {
+    sections.push({
+      key: 'summary',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Professional Profile</h2>
           <p style={contentStyle}>{summary}</p>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Experience */}
-      {experience && experience.length > 0 && (
+  // Experience
+  if (experience && experience.length > 0) {
+    sections.push({
+      key: 'experience',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Professional Experience</h2>
           {experience.map((job, index) => (
@@ -138,10 +144,15 @@ const ProfessionalTemplate = ({ data, scale = 1, isPreview = false }) => {
             </div>
           ))}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Skills */}
-      {skills && (
+  // Skills
+  if (skills) {
+    sections.push({
+      key: 'skills',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Core Competencies</h2>
           <p style={contentStyle}>
@@ -153,10 +164,15 @@ const ProfessionalTemplate = ({ data, scale = 1, isPreview = false }) => {
             </p>
           )}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Education */}
-      {education && education.length > 0 && (
+  // Education
+  if (education && education.length > 0) {
+    sections.push({
+      key: 'education',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Education & Credentials</h2>
           {education.map((edu, index) => (
@@ -169,11 +185,16 @@ const ProfessionalTemplate = ({ data, scale = 1, isPreview = false }) => {
             </div>
           ))}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Achievements */}
-      {achievements && achievements.length > 0 && (
-        <div style={{ ...sectionStyle, paddingBottom: '35px', borderBottom: 'none' }}>
+  // Achievements
+  if (achievements && achievements.length > 0) {
+    sections.push({
+      key: 'achievements',
+      content: (
+        <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Notable Achievements</h2>
           <ul style={{ margin: 0, paddingLeft: '18px' }}>
             {achievements.map((achievement, i) => (
@@ -181,7 +202,31 @@ const ProfessionalTemplate = ({ data, scale = 1, isPreview = false }) => {
             ))}
           </ul>
         </div>
-      )}
+      )
+    });
+  }
+
+  return (
+    <div style={containerStyle} className="professional-template">
+      {/* Header */}
+      <div style={headerStyle}>
+        <h1 style={nameStyle}>{personalInfo?.name || 'Your Name'}</h1>
+        <p style={titleStyle}>{personalInfo?.title || 'Professional Title'}</p>
+        <div style={contactStyle}>
+          {personalInfo?.email && <span>{personalInfo.email}</span>}
+          {personalInfo?.phone && <span>{personalInfo.phone}</span>}
+          {personalInfo?.location && <span>{personalInfo.location}</span>}
+          {personalInfo?.linkedin && <span>{personalInfo.linkedin}</span>}
+        </div>
+      </div>
+
+      {/* Sections with dividers */}
+      {sections.map((section, index) => (
+        <React.Fragment key={section.key}>
+          {section.content}
+          {index < sections.length - 1 && <div style={dividerStyle} />}
+        </React.Fragment>
+      ))}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React from 'react';
 
 const TechTemplate = ({ data, scale = 1, isPreview = false }) => {
   const { personalInfo, summary, experience, skills, education, projects } = data;
-  
+
   const containerStyle = {
     transform: `scale(${scale})`,
     transformOrigin: 'top left',
@@ -54,6 +54,15 @@ const TechTemplate = ({ data, scale = 1, isPreview = false }) => {
     display: 'flex',
     alignItems: 'center',
     gap: '8px'
+  };
+
+  const dividerStyle = {
+    borderBottom: '1px solid #30363d',
+    marginTop: '10px',
+    marginBottom: '10px',
+    width: 'calc(100% - 60px)',
+    marginLeft: '30px',
+    marginRight: '30px'
   };
 
   const iconStyle = {
@@ -117,32 +126,29 @@ const TechTemplate = ({ data, scale = 1, isPreview = false }) => {
     color: '#79c0ff'
   };
 
-  return (
-    <div style={containerStyle} className="tech-template">
-      {/* Header */}
-      <div style={headerStyle}>
-        <h1 style={nameStyle}>{personalInfo?.name || 'Your Name'}</h1>
-        <p style={titleStyle}>{personalInfo?.title || 'Technical Title'}</p>
-        <div>
-          {personalInfo?.email && <span style={linkStyle}>{personalInfo.email}</span>}
-          {personalInfo?.github && <a href={`https://${personalInfo.github}`} style={linkStyle}>{personalInfo.github}</a>}
-          {personalInfo?.linkedin && <a href={`https://${personalInfo.linkedin}`} style={linkStyle}>{personalInfo.linkedin}</a>}
-          {personalInfo?.website && <a href={`https://${personalInfo.website}`} style={linkStyle}>{personalInfo.website}</a>}
-        </div>
-      </div>
+  // Build visible sections array
+  const sections = [];
 
-      {/* Summary */}
-      {summary && (
+  // Summary
+  if (summary) {
+    sections.push({
+      key: 'summary',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>
             <span style={iconStyle}>&#9679;</span> About
           </h2>
           <p style={{ lineHeight: '1.5' }}>{summary}</p>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Tech Stack */}
-      {skills && (
+  // Tech Stack
+  if (skills) {
+    sections.push({
+      key: 'skills',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>
             <span style={iconStyle}>&#9679;</span> Tech Stack
@@ -153,10 +159,15 @@ const TechTemplate = ({ data, scale = 1, isPreview = false }) => {
             ))}
           </div>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Experience */}
-      {experience && experience.length > 0 && (
+  // Experience
+  if (experience && experience.length > 0) {
+    sections.push({
+      key: 'experience',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>
             <span style={iconStyle}>&#9679;</span> Experience
@@ -183,10 +194,15 @@ const TechTemplate = ({ data, scale = 1, isPreview = false }) => {
             </div>
           ))}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Projects */}
-      {projects && projects.length > 0 && (
+  // Projects
+  if (projects && projects.length > 0) {
+    sections.push({
+      key: 'projects',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>
             <span style={iconStyle}>&#9679;</span> Projects
@@ -205,11 +221,16 @@ const TechTemplate = ({ data, scale = 1, isPreview = false }) => {
             </div>
           ))}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Education */}
-      {education && education.length > 0 && (
-        <div style={{ ...sectionStyle, borderBottom: 'none' }}>
+  // Education
+  if (education && education.length > 0) {
+    sections.push({
+      key: 'education',
+      content: (
+        <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>
             <span style={iconStyle}>&#9679;</span> Education
           </h2>
@@ -222,7 +243,31 @@ const TechTemplate = ({ data, scale = 1, isPreview = false }) => {
             </div>
           ))}
         </div>
-      )}
+      )
+    });
+  }
+
+  return (
+    <div style={containerStyle} className="tech-template">
+      {/* Header */}
+      <div style={headerStyle}>
+        <h1 style={nameStyle}>{personalInfo?.name || 'Your Name'}</h1>
+        <p style={titleStyle}>{personalInfo?.title || 'Technical Title'}</p>
+        <div>
+          {personalInfo?.email && <span style={linkStyle}>{personalInfo.email}</span>}
+          {personalInfo?.github && <a href={`https://${personalInfo.github}`} style={linkStyle}>{personalInfo.github}</a>}
+          {personalInfo?.linkedin && <a href={`https://${personalInfo.linkedin}`} style={linkStyle}>{personalInfo.linkedin}</a>}
+          {personalInfo?.website && <a href={`https://${personalInfo.website}`} style={linkStyle}>{personalInfo.website}</a>}
+        </div>
+      </div>
+
+      {/* Sections with dividers */}
+      {sections.map((section, index) => (
+        <React.Fragment key={section.key}>
+          {section.content}
+          {index < sections.length - 1 && <div style={dividerStyle} />}
+        </React.Fragment>
+      ))}
     </div>
   );
 };

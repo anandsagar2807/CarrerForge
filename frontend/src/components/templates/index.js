@@ -1,3 +1,4 @@
+export { default as CampusPlacementTemplate } from './CampusPlacementTemplate';
 export { default as MinimalistTemplate } from './MinimalistTemplate';
 export { default as ModernTemplate } from './ModernTemplate';
 export { default as ProfessionalTemplate } from './ProfessionalTemplate';
@@ -6,3 +7,8 @@ export { default as CompactTemplate } from './CompactTemplate';
 export { default as ExecutiveTemplate } from './ExecutiveTemplate';
 export { default as ATSTemplate } from './ATSTemplate';
 export { default as TechTemplate } from './TechTemplate';
+export { default as DevResumeTemplate } from './DevResumeTemplate';
+export { default as FAANGTemplate } from './FAANGTemplate';
+export { default as SVEngineerTemplate } from './SVEngineerTemplate';
+export { default as ServiceEngineerTemplate } from './ServiceEngineerTemplate';
+export { default as EliteEngineerTemplate } from './EliteEngineerTemplate';

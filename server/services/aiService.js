@@ -1,31 +1,26 @@
 const axios = require('axios');
 
-const AI_API_KEY = process.env.OPENROUTER_API_KEY;
-const AI_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const DEFAULT_MODEL = process.env.AI_MODEL || 'google/gemini-2.0-flash-001';
+const GROQ_API_KEY = process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY;
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-const aiRequest = async (messages, temperature = 0.7, maxTokens = 2000) => {
-  if (!AI_API_KEY) {
-    console.error('No API key found. OPENROUTER_API_KEY:', process.env.OPENROUTER_API_KEY);
-    throw new Error('API key not configured. Please set OPENROUTER_API_KEY in environment variables.');
+const groqRequest = async (messages, temperature = 0.7, maxTokens = 2000) => {
+  if (!GROQ_API_KEY) {
+    console.error('No API key found. GROQ_API_KEY:', process.env.GROQ_API_KEY);
+    throw new Error('API key not configured. Please set GROQ_API_KEY or OPENAI_API_KEY in environment variables.');
   }
 
   try {
     const payload = {
-      model: DEFAULT_MODEL,
+      model: 'llama-3.3-70b-versatile',
       messages,
       temperature,
       max_tokens: maxTokens,
-      headers: {
-        "HTTP-Referer": process.env.CLIENT_URL || "http://localhost:3000",
-        "X-Title": "Zaalima Resume Forge Pro"
-      }
     };
-    console.log('Sending to AI API:', JSON.stringify(payload, null, 2));
+    console.log('Sending to Groq API:', JSON.stringify(payload, null, 2));
 
-    const response = await axios.post(AI_API_URL, payload, {
+    const response = await axios.post(GROQ_API_URL, payload, {
       headers: {
-        'Authorization': `Bearer ${AI_API_KEY}`,
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
       timeout: 30000,
@@ -33,65 +28,48 @@ const aiRequest = async (messages, temperature = 0.7, maxTokens = 2000) => {
 
     return response.data.choices[0]?.message?.content;
   } catch (error) {
-    console.error('AI API error:', error.response?.data || error.message);
+    console.error('Groq API error:', error.response?.data || error.message);
     throw new Error(error.response?.data?.error?.message || 'AI service unavailable');
   }
 };
 
 // Analyze Job Description
 exports.analyzeJD = async (jdText) => {
-  const content = await aiRequest([
+  const content = await groqRequest([
     {
       role: 'system',
-      content: 'You are a sophisticated JD Analysis Agent. Your task is to scrape and parse the target Job Description to semantically extract and rank critical keywords. Focus on hard skills, soft skills, technologies, and industry-specific terminology.'
+      content: 'You are an expert ATS analyzer. Extract key skills and keywords from job descriptions. Return valid JSON only.'
     },
     {
       role: 'user',
-      content: `Analyze this job description and extract critical keywords. Rank them by importance (high, medium, low). 
-      Return valid JSON only in this format: 
-      { 
-        "keywords": [
-          { "term": "keyword", "rank": "high|medium|low", "category": "technical|soft|tool" }
-        ],
-        "summary": "Brief summary of key requirements",
-        "atsTips": ["tip1", "tip2"] 
-      }. 
-      JD: ${jdText}`
+      content: `Analyze this job description and extract key skills and keywords. Return as JSON: { "keywords": [], "priority": [], "skills": { "required": [], "preferred": [] }, "experience": "", "education": "" }. JD: ${jdText}`
     }
   ], 0.3);
   
   try {
     return JSON.parse(content);
   } catch {
-    return { keywords: [], summary: "", atsTips: [] };
+    return { keywords: [], priority: [], skills: { required: [], preferred: [] } };
   }
 };
 
 // Rewrite Bullet Point
-exports.rewriteBullet = async (bullet, keyword, context = "") => {
-  return await aiRequest([
+exports.rewriteBullet = async (bullet, keyword) => {
+  return await groqRequest([
     {
       role: 'system',
-      content: 'You are an expert resume editor. Your goal is to rewrite resume bullet points to perfectly match JD keywords, optimizing for Applicant Tracking Systems (ATS). Use the XYZ formula (Accomplished X, as measured by Y, by doing Z) and ensure the target keywords are naturally integrated.'
+      content: 'You are an expert resume writer. Rewrite bullet points to be impactful, ATS-optimized, and results-driven. Use the XYZ formula (Accomplished X, as measured by Y, by doing Z).'
     },
     {
       role: 'user',
-      content: `Rewrite this resume bullet point to include the target keyword(s): '${keyword}'. 
-      Optimization Context: ${context}
-      Original Bullet: ${bullet}
-      
-      Requirements:
-      1. Use strong action verbs.
-      2. Quantify achievements where possible.
-      3. Ensure the keyword fits naturally.
-      4. Maximize ATS score.`
+      content: `Rewrite this resume bullet point to be impactful, include the keyword '${keyword}', and optimize for ATS. Use strong action verbs and quantify where possible. Bullet: ${bullet}`
     }
   ]);
 };
 
 // Calculate ATS Score
 exports.calculateATSScore = async (resumeText, jdText) => {
-  const content = await aiRequest([
+  const content = await groqRequest([
     {
       role: 'system',
       content: 'You are an expert ATS scoring system. Compare resumes against job descriptions with strict analysis. Return valid JSON only.'
@@ -111,7 +89,7 @@ exports.calculateATSScore = async (resumeText, jdText) => {
 
 // Generate Cover Letter
 exports.generateCoverLetter = async (resumeText, jdText, tone = 'professional') => {
-  return await aiRequest([
+  return await groqRequest([
     {
       role: 'system',
       content: `You are an expert cover letter writer. Generate a compelling ${tone} cover letter. Be tailored to the role, highlight relevant experience, show enthusiasm. 3-4 paragraphs.`
@@ -143,12 +121,12 @@ Be concise, actionable, and friendly. If asked about something unrelated to care
     { role: 'user', content: message }
   ];
 
-  return await aiRequest(messages, 0.7, 1000);
+  return await groqRequest(messages, 0.7, 1000);
 };
 
 // Generate Dynamic Template Content
 exports.generateTemplateContent = async (templateStyle, jobRole = 'Senior Professional', industry = 'Technology') => {
-  const content = await aiRequest([
+  const content = await groqRequest([
     {
       role: 'system',
       content: `You are a professional resume writer. Generate realistic, ATS-friendly resume content.
@@ -178,7 +156,7 @@ Return valid JSON with this exact structure:
 
 // Generate Interview Questions
 exports.generateInterviewQuestions = async (jobTitle, company = '', jobDescription = '') => {
-  const content = await aiRequest([
+  const content = await groqRequest([
     {
       role: 'system',
       content: 'You are an expert interview coach. Generate relevant interview questions with suggested answer frameworks. Return valid JSON.'

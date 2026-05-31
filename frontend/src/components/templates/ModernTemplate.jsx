@@ -2,7 +2,7 @@ import React from 'react';
 
 const ModernTemplate = ({ data, scale = 1, isPreview = false }) => {
   const { personalInfo, summary, experience, skills, education } = data;
-  
+
   const containerStyle = {
     transform: `scale(${scale})`,
     transformOrigin: 'top left',
@@ -102,6 +102,13 @@ const ModernTemplate = ({ data, scale = 1, isPreview = false }) => {
     marginBottom: '12px'
   };
 
+  const dividerStyle = {
+    borderBottom: '1px solid #cccccc',
+    marginTop: '10px',
+    marginBottom: '10px',
+    width: '100%'
+  };
+
   const jobTitleStyle = {
     fontWeight: '600',
     fontSize: '11px',
@@ -120,6 +127,50 @@ const ModernTemplate = ({ data, scale = 1, isPreview = false }) => {
     color: '#94a3b8',
     marginBottom: '8px'
   };
+
+  // Build main content sections
+  const mainSections = [];
+
+  // Summary
+  if (summary) {
+    mainSections.push({
+      key: 'summary',
+      content: (
+        <div style={sectionStyle}>
+          <h2 style={sectionTitleStyle}>About Me</h2>
+          <p style={{ fontSize: '10px', color: '#475569', lineHeight: '1.6' }}>{summary}</p>
+        </div>
+      )
+    });
+  }
+
+  // Experience
+  if (experience && experience.length > 0) {
+    mainSections.push({
+      key: 'experience',
+      content: (
+        <div style={sectionStyle}>
+          <h2 style={sectionTitleStyle}>Work Experience</h2>
+          {experience.map((job, index) => (
+            <div key={index} style={{ marginBottom: '18px' }}>
+              <p style={jobTitleStyle}>{job.title}</p>
+              <p style={companyStyle}>{job.company}</p>
+              <p style={dateStyle}>{job.startDate} – {job.endDate}</p>
+              {job.achievements && job.achievements.length > 0 && (
+                <ul style={{ margin: 0, paddingLeft: '14px' }}>
+                  {job.achievements.map((achievement, i) => (
+                    <li key={i} style={{ fontSize: '9px', color: '#475569', marginBottom: '4px' }}>
+                      {achievement}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )
+    });
+  }
 
   return (
     <div style={containerStyle} className="modern-template">
@@ -186,36 +237,12 @@ const ModernTemplate = ({ data, scale = 1, isPreview = false }) => {
 
       {/* Main Content */}
       <div style={mainStyle}>
-        {/* Summary */}
-        {summary && (
-          <div style={sectionStyle}>
-            <h2 style={sectionTitleStyle}>About Me</h2>
-            <p style={{ fontSize: '10px', color: '#475569', lineHeight: '1.6' }}>{summary}</p>
-          </div>
-        )}
-
-        {/* Experience */}
-        {experience && experience.length > 0 && (
-          <div style={sectionStyle}>
-            <h2 style={sectionTitleStyle}>Work Experience</h2>
-            {experience.map((job, index) => (
-              <div key={index} style={{ marginBottom: '18px' }}>
-                <p style={jobTitleStyle}>{job.title}</p>
-                <p style={companyStyle}>{job.company}</p>
-                <p style={dateStyle}>{job.startDate} – {job.endDate}</p>
-                {job.achievements && job.achievements.length > 0 && (
-                  <ul style={{ margin: 0, paddingLeft: '14px' }}>
-                    {job.achievements.map((achievement, i) => (
-                      <li key={i} style={{ fontSize: '9px', color: '#475569', marginBottom: '4px' }}>
-                        {achievement}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+        {mainSections.map((section, index) => (
+          <React.Fragment key={section.key}>
+            {section.content}
+            {index < mainSections.length - 1 && <div style={dividerStyle} />}
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );

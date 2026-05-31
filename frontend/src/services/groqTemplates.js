@@ -2,6 +2,15 @@ const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 export const templateStyles = {
+  campusplacement: {
+    id: 'campusplacement',
+    name: 'Campus Placement',
+    category: 'Fresher',
+    premium: false,
+    description: 'ATS-optimized resume template designed for service-based company placements like TCS, Infosys, Wipro, Cognizant, Accenture, Capgemini, Deloitte, HCL, Tech Mahindra, LTIMindtree, and IBM',
+    layout: 'single-column',
+    sections: ['header', 'education', 'skills', 'internships', 'projects', 'certifications', 'achievements', 'codingProfiles', 'extraCurricular']
+  },
   minimalist: {
     id: 'minimalist',
     name: 'Minimalist',
@@ -73,6 +82,51 @@ export const templateStyles = {
     description: 'Developer-focused layout with tech stack emphasis',
     layout: 'tech-stack',
     sections: ['header', 'summary', 'skills', 'experience', 'projects', 'education']
+  },
+  devresume: {
+    id: 'devresume',
+    name: 'Dev Resume',
+    category: 'Developer',
+    premium: false,
+    description: 'Modern ATS-friendly single-page developer resume with clean typography and section hierarchy',
+    layout: 'single-column',
+    sections: ['header', 'education', 'skills', 'internships', 'projects', 'certifications', 'codingProfiles', 'hackathons']
+  },
+  faang: {
+    id: 'faang',
+    name: 'FAANG Elite',
+    category: 'Premium',
+    premium: true,
+    description: 'Ultra-premium ATS-optimized software engineer resume inspired by FAANG candidates — luxury minimalism with sharp typography hierarchy',
+    layout: 'single-column',
+    sections: ['header', 'education', 'skills', 'experience', 'projects', 'certifications', 'achievements', 'codingProfiles', 'hackathons']
+  },
+  svengineer: {
+    id: 'svengineer',
+    name: 'SV Engineer',
+    category: 'Premium',
+    premium: true,
+    description: 'World-class Silicon Valley senior engineer resume — luxurious minimalist design with recruiter-focused layout, open source & leadership sections',
+    layout: 'single-column',
+    sections: ['header', 'education', 'skills', 'experience', 'projects', 'openSource', 'certifications', 'competitiveProgramming', 'leadership']
+  },
+  serviceengineer: {
+    id: 'serviceengineer',
+    name: 'Service Engineer Pro',
+    category: 'ATS Friendly',
+    premium: false,
+    description: 'Ultra-professional ATS-friendly software engineer resume optimized for service-based company recruiters (TCS, Infosys, Accenture, Deloitte, Cognizant, Capgemini) and campus placement shortlisting',
+    layout: 'single-column',
+    sections: ['header', 'education', 'skills', 'internships', 'projects', 'certifications', 'codingProfiles', 'achievements', 'extraCurricular']
+  },
+  eliteengineer: {
+    id: 'eliteengineer',
+    name: 'Elite Engineer',
+    category: 'Premium',
+    premium: true,
+    description: 'World-class premium software engineer resume with executive-level professionalism — luxury minimalism, Swiss-style alignment, FAANG resume formatting, recruiter-trusted design',
+    layout: 'single-column',
+    sections: ['header', 'profile', 'education', 'skills', 'experience', 'projects', 'certifications', 'codingProfiles', 'leadership']
   }
 };
 

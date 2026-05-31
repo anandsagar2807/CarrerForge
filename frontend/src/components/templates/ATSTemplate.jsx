@@ -2,7 +2,7 @@ import React from 'react';
 
 const ATSTemplate = ({ data, scale = 1, isPreview = false }) => {
   const { personalInfo, summary, experience, skills, education } = data;
-  
+
   const containerStyle = {
     transform: `scale(${scale})`,
     transformOrigin: 'top left',
@@ -12,7 +12,8 @@ const ATSTemplate = ({ data, scale = 1, isPreview = false }) => {
     color: '#000000',
     fontFamily: '"Times New Roman", Times, serif',
     fontSize: '11px',
-    lineHeight: '1.3'
+    lineHeight: '1.3',
+    padding: '20mm'
   };
 
   const sectionStyle = {
@@ -44,6 +45,13 @@ const ATSTemplate = ({ data, scale = 1, isPreview = false }) => {
     paddingBottom: '2px'
   };
 
+  const dividerStyle = {
+    borderBottom: '1px solid #cccccc',
+    marginTop: '10px',
+    marginBottom: '10px',
+    width: '100%'
+  };
+
   const jobHeaderStyle = {
     marginBottom: '5px'
   };
@@ -71,30 +79,27 @@ const ATSTemplate = ({ data, scale = 1, isPreview = false }) => {
     marginRight: '15px'
   };
 
-  return (
-    <div style={containerStyle} className="ats-template">
-      {/* Header */}
-      <div>
-        <p style={headerStyle}>{personalInfo?.name || 'YOUR NAME'}</p>
-        <p style={subHeaderStyle}>{personalInfo?.title || 'PROFESSIONAL TITLE'}</p>
-        <p style={contactStyle}>
-          {personalInfo?.email && <span>{personalInfo.email}</span>}
-          {personalInfo?.phone && <span> | {personalInfo.phone}</span>}
-          {personalInfo?.location && <span> | {personalInfo.location}</span>}
-          {personalInfo?.linkedin && <span> | {personalInfo.linkedin}</span>}
-        </p>
-      </div>
+  // Build visible sections array
+  const sections = [];
 
-      {/* Summary */}
-      {summary && (
+  // Summary
+  if (summary) {
+    sections.push({
+      key: 'summary',
+      content: (
         <div style={sectionStyle}>
           <p style={sectionTitleStyle}>PROFESSIONAL SUMMARY</p>
           <p>{summary}</p>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Skills - Put first for ATS */}
-      {skills && (
+  // Skills
+  if (skills) {
+    sections.push({
+      key: 'skills',
+      content: (
         <div style={sectionStyle}>
           <p style={sectionTitleStyle}>SKILLS</p>
           <p>
@@ -110,10 +115,15 @@ const ATSTemplate = ({ data, scale = 1, isPreview = false }) => {
             </p>
           )}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Experience */}
-      {experience && experience.length > 0 && (
+  // Experience
+  if (experience && experience.length > 0) {
+    sections.push({
+      key: 'experience',
+      content: (
         <div style={sectionStyle}>
           <p style={sectionTitleStyle}>WORK HISTORY</p>
           {experience.map((job, index) => (
@@ -136,11 +146,16 @@ const ATSTemplate = ({ data, scale = 1, isPreview = false }) => {
             </div>
           ))}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Education */}
-      {education && education.length > 0 && (
-        <div style={{ ...sectionStyle, marginBottom: '0' }}>
+  // Education
+  if (education && education.length > 0) {
+    sections.push({
+      key: 'education',
+      content: (
+        <div style={sectionStyle}>
           <p style={sectionTitleStyle}>EDUCATION</p>
           {education.map((edu, index) => (
             <div key={index}>
@@ -151,7 +166,31 @@ const ATSTemplate = ({ data, scale = 1, isPreview = false }) => {
             </div>
           ))}
         </div>
-      )}
+      )
+    });
+  }
+
+  return (
+    <div style={containerStyle} className="ats-template">
+      {/* Header */}
+      <div>
+        <p style={headerStyle}>{personalInfo?.name || 'YOUR NAME'}</p>
+        <p style={subHeaderStyle}>{personalInfo?.title || 'PROFESSIONAL TITLE'}</p>
+        <p style={contactStyle}>
+          {personalInfo?.email && <span>{personalInfo.email}</span>}
+          {personalInfo?.phone && <span> | {personalInfo.phone}</span>}
+          {personalInfo?.location && <span> | {personalInfo.location}</span>}
+          {personalInfo?.linkedin && <span> | {personalInfo.linkedin}</span>}
+        </p>
+      </div>
+
+      {/* Sections with dividers */}
+      {sections.map((section, index) => (
+        <React.Fragment key={section.key}>
+          {section.content}
+          {index < sections.length - 1 && <div style={dividerStyle} />}
+        </React.Fragment>
+      ))}
     </div>
   );
 };

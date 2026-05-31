@@ -106,6 +106,41 @@ Your ResumeForge Pro application is now a **complete, professional, premium full
 
 ---
 
+## 🔧 Technical Stack
+
+### Frontend
+```
+- React 18.2.0
+- Vite 4.5.14
+- TailwindCSS 3.3.5
+- Framer Motion 10.16.4
+- React Router 6.20.0
+- Lucide Icons
+- Axios
+```
+
+### Backend
+```
+- Node.js
+- Express 5.2.1
+- MongoDB + Mongoose 9.4.1
+- Groq API (llama-3.1-70b-versatile)
+- Puppeteer (PDF generation)
+- JWT Authentication
+- Stripe Integration
+- CORS enabled
+- Rate limiting
+```
+
+### Database
+```
+- MongoDB Atlas
+- Connection: Active ✅
+- Collections: Users, Resumes
+```
+
+---
+
 ## 📦 Ready for Deployment
 
 ### Deployment Platforms (Recommended)

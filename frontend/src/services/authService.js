@@ -24,6 +24,14 @@ export const authService = {
     localStorage.removeItem('user');
   },
 
+  async fetchCurrentUser() {
+    const response = await api.get('/auth/me');
+    if (response.data) {
+      localStorage.setItem('user', JSON.stringify(response.data));
+    }
+    return response.data;
+  },
+
   getCurrentUser() {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
@@ -35,5 +43,10 @@ export const authService = {
 
   isAuthenticated() {
     return !!localStorage.getItem('token');
+  },
+
+  isProUser() {
+    const user = this.getCurrentUser();
+    return user?.subscription?.plan === 'pro' && user?.subscription?.status === 'active';
   },
 };

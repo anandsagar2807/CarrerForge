@@ -2,7 +2,7 @@ import React from 'react';
 
 const CreativeTemplate = ({ data, scale = 1, isPreview = false }) => {
   const { personalInfo, summary, experience, skills, education, projects } = data;
-  
+
   const containerStyle = {
     transform: `scale(${scale})`,
     transformOrigin: 'top left',
@@ -72,6 +72,13 @@ const CreativeTemplate = ({ data, scale = 1, isPreview = false }) => {
     gap: '8px'
   };
 
+  const dividerStyle = {
+    borderBottom: '1px solid #cccccc',
+    marginTop: '10px',
+    marginBottom: '10px',
+    width: '100%'
+  };
+
   const sectionTitleIconStyle = {
     width: '20px',
     height: '20px',
@@ -121,6 +128,134 @@ const CreativeTemplate = ({ data, scale = 1, isPreview = false }) => {
     boxShadow: '0 2px 8px rgba(124, 58, 237, 0.1)'
   };
 
+  // Build left column sections
+  const leftSections = [];
+
+  // Summary
+  if (summary) {
+    leftSections.push({
+      key: 'summary',
+      content: (
+        <div style={sectionStyle}>
+          <h2 style={sectionTitleStyle}>
+            <span style={sectionTitleIconStyle}>✦</span>
+            About Me
+          </h2>
+          <p style={{ fontSize: '10px', color: '#475569', lineHeight: '1.6' }}>{summary}</p>
+        </div>
+      )
+    });
+  }
+
+  // Experience
+  if (experience && experience.length > 0) {
+    leftSections.push({
+      key: 'experience',
+      content: (
+        <div style={sectionStyle}>
+          <h2 style={sectionTitleStyle}>
+            <span style={sectionTitleIconStyle}>💼</span>
+            Experience
+          </h2>
+          {experience.map((job, index) => (
+            <div key={index} style={{ marginBottom: '16px' }}>
+              <p style={jobTitleStyle}>{job.title}</p>
+              <p style={companyStyle}>{job.company}</p>
+              <p style={dateStyle}>{job.startDate} — {job.endDate}</p>
+              {job.achievements && job.achievements.length > 0 && (
+                <ul style={{ margin: 0, paddingLeft: '14px' }}>
+                  {job.achievements.map((achievement, i) => (
+                    <li key={i} style={{ fontSize: '9px', color: '#475569', marginBottom: '4px' }}>
+                      {achievement}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      )
+    });
+  }
+
+  // Projects
+  if (projects && projects.length > 0) {
+    leftSections.push({
+      key: 'projects',
+      content: (
+        <div style={sectionStyle}>
+          <h2 style={sectionTitleStyle}>
+            <span style={sectionTitleIconStyle}>🎨</span>
+            Projects
+          </h2>
+          {projects.map((project, index) => (
+            <div key={index} style={projectCardStyle}>
+              <p style={{ fontWeight: '700', fontSize: '10px', color: '#1e1b4b' }}>{project.name}</p>
+              <p style={{ fontSize: '9px', color: '#64748b', marginTop: '4px' }}>{project.description}</p>
+              {project.tech && (
+                <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                  {project.tech.map((t, i) => (
+                    <span key={i} style={{ fontSize: '8px', padding: '2px 8px', backgroundColor: '#fce7f3', borderRadius: '10px', color: '#db2777' }}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )
+    });
+  }
+
+  // Build right column sections
+  const rightSections = [];
+
+  // Skills
+  if (skills) {
+    rightSections.push({
+      key: 'skills',
+      content: (
+        <div style={sectionStyle}>
+          <h2 style={sectionTitleStyle}>
+            <span style={sectionTitleIconStyle}>⚡</span>
+            Superpowers
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+            {skills.technical?.slice(0, 8).map((skill, i) => (
+              <span key={`tech-${i}`} style={skillTagStyle}>{skill}</span>
+            ))}
+          </div>
+          {skills.soft?.slice(0, 4).map((skill, i) => (
+            <span key={`soft-${i}`} style={{ ...skillTagStyle, backgroundColor: '#fce7f3', color: '#db2777' }}>{skill}</span>
+          ))}
+        </div>
+      )
+    });
+  }
+
+  // Education
+  if (education && education.length > 0) {
+    rightSections.push({
+      key: 'education',
+      content: (
+        <div style={sectionStyle}>
+          <h2 style={sectionTitleStyle}>
+            <span style={sectionTitleIconStyle}>🎓</span>
+            Education
+          </h2>
+          {education.map((edu, index) => (
+            <div key={index} style={{ marginBottom: '12px' }}>
+              <p style={{ fontWeight: '700', fontSize: '10px' }}>{edu.school}</p>
+              <p style={{ fontSize: '9px', color: '#64748b' }}>{edu.degree} in {edu.field}</p>
+              <p style={{ fontSize: '8px', color: '#a78bfa' }}>{edu.year}</p>
+            </div>
+          ))}
+        </div>
+      )
+    });
+  }
+
   return (
     <div style={containerStyle} className="creative-template">
       {/* Banner */}
@@ -138,105 +273,22 @@ const CreativeTemplate = ({ data, scale = 1, isPreview = false }) => {
       {/* Main Content */}
       <div style={mainStyle}>
         <div style={leftColumnStyle}>
-          {/* Summary */}
-          {summary && (
-            <div style={sectionStyle}>
-              <h2 style={sectionTitleStyle}>
-                <span style={sectionTitleIconStyle}>✦</span>
-                About Me
-              </h2>
-              <p style={{ fontSize: '10px', color: '#475569', lineHeight: '1.6' }}>{summary}</p>
-            </div>
-          )}
-
-          {/* Experience */}
-          {experience && experience.length > 0 && (
-            <div style={sectionStyle}>
-              <h2 style={sectionTitleStyle}>
-                <span style={sectionTitleIconStyle}>💼</span>
-                Experience
-              </h2>
-              {experience.map((job, index) => (
-                <div key={index} style={{ marginBottom: '16px' }}>
-                  <p style={jobTitleStyle}>{job.title}</p>
-                  <p style={companyStyle}>{job.company}</p>
-                  <p style={dateStyle}>{job.startDate} — {job.endDate}</p>
-                  {job.achievements && job.achievements.length > 0 && (
-                    <ul style={{ margin: 0, paddingLeft: '14px' }}>
-                      {job.achievements.map((achievement, i) => (
-                        <li key={i} style={{ fontSize: '9px', color: '#475569', marginBottom: '4px' }}>
-                          {achievement}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Projects */}
-          {projects && projects.length > 0 && (
-            <div style={sectionStyle}>
-              <h2 style={sectionTitleStyle}>
-                <span style={sectionTitleIconStyle}>🎨</span>
-                Projects
-              </h2>
-              {projects.map((project, index) => (
-                <div key={index} style={projectCardStyle}>
-                  <p style={{ fontWeight: '700', fontSize: '10px', color: '#1e1b4b' }}>{project.name}</p>
-                  <p style={{ fontSize: '9px', color: '#64748b', marginTop: '4px' }}>{project.description}</p>
-                  {project.tech && (
-                    <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {project.tech.map((t, i) => (
-                        <span key={i} style={{ fontSize: '8px', padding: '2px 8px', backgroundColor: '#fce7f3', borderRadius: '10px', color: '#db2777' }}>
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+          {leftSections.map((section, index) => (
+            <React.Fragment key={section.key}>
+              {section.content}
+              {index < leftSections.length - 1 && <div style={dividerStyle} />}
+            </React.Fragment>
+          ))}
         </div>
 
-        {/* Right Column - Skills */}
+        {/* Right Column */}
         <div style={rightColumnStyle}>
-          {/* Skills */}
-          {skills && (
-            <div style={sectionStyle}>
-              <h2 style={sectionTitleStyle}>
-                <span style={sectionTitleIconStyle}>⚡</span>
-                Superpowers
-              </h2>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                {skills.technical?.slice(0, 8).map((skill, i) => (
-                  <span key={`tech-${i}`} style={skillTagStyle}>{skill}</span>
-                ))}
-              </div>
-              {skills.soft?.slice(0, 4).map((skill, i) => (
-                <span key={`soft-${i}`} style={{ ...skillTagStyle, backgroundColor: '#fce7f3', color: '#db2777' }}>{skill}</span>
-              ))}
-            </div>
-          )}
-
-          {/* Education */}
-          {education && education.length > 0 && (
-            <div style={sectionStyle}>
-              <h2 style={sectionTitleStyle}>
-                <span style={sectionTitleIconStyle}>🎓</span>
-                Education
-              </h2>
-              {education.map((edu, index) => (
-                <div key={index} style={{ marginBottom: '12px' }}>
-                  <p style={{ fontWeight: '700', fontSize: '10px' }}>{edu.school}</p>
-                  <p style={{ fontSize: '9px', color: '#64748b' }}>{edu.degree} in {edu.field}</p>
-                  <p style={{ fontSize: '8px', color: '#a78bfa' }}>{edu.year}</p>
-                </div>
-              ))}
-            </div>
-          )}
+          {rightSections.map((section, index) => (
+            <React.Fragment key={section.key}>
+              {section.content}
+              {index < rightSections.length - 1 && <div style={dividerStyle} />}
+            </React.Fragment>
+          ))}
         </div>
       </div>
     </div>

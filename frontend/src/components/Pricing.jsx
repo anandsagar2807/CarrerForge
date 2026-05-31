@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Sparkles, ArrowRight } from 'lucide-react';
+import { Check, Sparkles, ArrowRight, Lock, Crown, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { paymentService } from '../services/paymentService';
 
 const plans = [
   {
@@ -14,7 +16,7 @@ const plans = [
       '1 resume template',
       'Basic AI suggestions',
       'PDF export',
-      'ATS scoring',
+      'ATS Score Checker — Free',
       'Email support',
     ],
     cta: 'Get Started',
@@ -27,12 +29,12 @@ const plans = [
     period: '/month',
     gradient: 'from-blue-700 to-blue-900',
     features: [
-      'Unlimited resumes',
-      'Cover letters generator',
-      'Premium templates',
+      'All 15+ premium templates',
       'Advanced AI writing assistant',
       'Unlimited PDF exports',
       'Full ATS optimization',
+      'Cover letter generator',
+      'LinkedIn integration',
       'Priority support',
       'Interview prep tools',
     ],
@@ -62,6 +64,73 @@ const plans = [
 
 const PricingCard = ({ plan, index }) => {
   const navigate = useNavigate();
+  const { user, isPro, isAuthenticated } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [currentPlan, setCurrentPlan] = useState(false);
+
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.subscription) {
+      const userPlan = user.subscription.plan;
+      if (plan.name.toLowerCase() === userPlan || (plan.name === 'Pro' && userPlan === 'pro')) {
+        setCurrentPlan(true);
+      }
+    }
+  }, [isAuthenticated, user, plan.name]);
+
+  const handleCheckout = async () => {
+    if (!isAuthenticated) {
+      navigate('/sign-up');
+      return;
+    }
+
+    if (plan.name === 'Free') {
+      navigate('/templates');
+      return;
+    }
+
+    if (plan.name === 'Enterprise') {
+      navigate('/sign-up');
+      return;
+    }
+
+    // Pro plan - initiate Stripe checkout
+    setLoading(true);
+    setError(null);
+    try {
+      const session = await paymentService.createCheckoutSession('pro');
+      if (session.url) {
+        window.location.href = session.url;
+      } else if (session.sessionId) {
+        // Redirect to Stripe hosted checkout
+        const stripeUrl = `https://checkout.stripe.com/c/pay/${session.sessionId}`;
+        window.location.href = stripeUrl;
+      }
+    } catch (err) {
+      console.error('Checkout session error:', err);
+      setError(err.response?.data?.message || 'Failed to start checkout. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  if (showSuccess) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="absolute inset-0 bg-green-50/95 backdrop-blur-sm rounded-3xl flex items-center justify-center z-20"
+      >
+        <div className="text-center">
+          <Crown className="w-12 h-12 text-green-600 mx-auto mb-3" />
+          <h3 className="text-xl font-bold text-green-800">You're now Pro!</h3>
+          <p className="text-green-600">All premium features unlocked</p>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -74,56 +143,85 @@ const PricingCard = ({ plan, index }) => {
       {/* Popular badge */}
       {plan.popular && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-blue-700 to-blue-900 text-white text-xs font-bold rounded-full shadow-lg">
             <Sparkles className="w-3.5 h-3.5" />
             Most Popular
           </div>
         </div>
       )}
 
-      <div className={`relative bg-white/5 rounded-[2.5rem] p-10 border border-white/10 backdrop-blur-xl hover:border-white/20 transition-all duration-500 h-full flex flex-col group ${plan.popular ? 'shadow-[0_0_40px_rgba(37,99,235,0.1)]' : ''}`}>
+      <div className={`relative bg-white rounded-3xl p-8 border-2 ${plan.popular ? 'border-blue-200 shadow-xl' : 'border-slate-200 shadow-lg'} hover:shadow-xl transition-all duration-300 h-full flex flex-col`}>
         {/* Plan header */}
-        <div className="mb-10">
-          <div className={`w-14 h-14 bg-gradient-to-br ${plan.gradient} rounded-2xl flex items-center justify-center mb-6 shadow-xl`}>
-            <span className="text-white font-bold text-xl">{plan.name[0]}</span>
+        <div className="mb-8">
+          <div className={`w-12 h-12 bg-gradient-to-br ${plan.gradient} rounded-2xl flex items-center justify-center mb-4 shadow-lg`}>
+            <span className="text-white font-bold text-lg">{plan.name[0]}</span>
           </div>
-          <h3 className="text-3xl font-bold text-white mb-2 tracking-tight">{plan.name}</h3>
-          <p className="text-slate-400 text-sm font-medium">{plan.description}</p>
+          <h3 className="text-2xl font-bold text-slate-900 mb-2">{plan.name}</h3>
+          <p className="text-slate-500 text-sm">{plan.description}</p>
         </div>
 
         {/* Price */}
-        <div className="mb-10">
-          <div className="flex items-baseline gap-2">
-            <span className="text-6xl font-extrabold text-white tracking-tighter">{plan.price}</span>
-            <span className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">{plan.period}</span>
+        <div className="mb-8">
+          <div className="flex items-baseline gap-1">
+            <span className="text-5xl font-bold text-slate-900">{plan.price}</span>
+            <span className="text-slate-500 font-medium">{plan.period}</span>
           </div>
         </div>
 
         {/* Features */}
-        <ul className="space-y-5 mb-10 flex-grow">
+        <ul className="space-y-4 mb-8 flex-grow">
           {plan.features.map((feature, i) => (
-            <li key={i} className="flex items-start gap-4 group/item">
-              <div className={`w-6 h-6 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover/item:border-blue-500/50 transition-colors`}>
-                <Check className="w-3.5 h-3.5 text-blue-400" />
+            <li key={i} className="flex items-start gap-3">
+              <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${plan.gradient} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                <Check className="w-3 h-3 text-white" />
               </div>
-              <span className="text-slate-300 text-[13px] font-medium leading-relaxed group-hover/item:text-white transition-colors">{feature}</span>
+              <span className="text-slate-600 text-sm">{feature}</span>
             </li>
           ))}
         </ul>
 
+        {/* Current plan indicator */}
+        {currentPlan && (
+          <div className="flex items-center justify-center gap-2 py-3 px-6 rounded-2xl bg-green-50 border-2 border-green-200 text-green-700 font-bold text-base">
+            <Check className="w-5 h-5" />
+            Current Plan
+          </div>
+        )}
+
+        {/* Error message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center">
+            {error}
+          </div>
+        )}
+
         {/* CTA Button */}
-        <motion.button
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/sign-up')}
-          className={`w-full py-5 px-6 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 group/btn ${plan.popular
-              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-500 hover:shadow-blue-500/30'
-              : 'bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:border-white/20'
-            }`}
-        >
-          {plan.cta}
-          <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-        </motion.button>
+        {!currentPlan && (
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleCheckout}
+            disabled={loading}
+            className={`w-full py-4 px-6 rounded-2xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 group/btn ${loading
+              ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+              : plan.popular
+                ? 'bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg hover:shadow-xl'
+                : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
+              }`}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                {plan.cta}
+                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+              </>
+            )}
+          </motion.button>
+        )}
       </div>
     </motion.div>
   );
@@ -131,30 +229,15 @@ const PricingCard = ({ plan, index }) => {
 
 const Pricing = () => {
   return (
-    <section id="pricing" className="py-24 lg:py-32 relative overflow-hidden bg-[#020617]">
-      <div className="section-container relative">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-5 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full mb-8"
-          >
-            <Sparkles className="w-4 h-4 text-blue-400" />
-            <span className="text-sm font-bold text-blue-100 uppercase tracking-widest">Pricing Plans</span>
-          </motion.div>
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">
-            Choose the perfect plan for <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">your career goals</span>
-          </h2>
-          <p className="text-xl text-slate-400 font-medium">
-            Simple, transparent pricing that grows with you. No hidden fees.
-          </p>
-        </div>
+    <section id="pricing" className="py-24 lg:py-32 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      <div className="absolute top-1/2 left-0 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl -translate-x-1/2" />
+      <div className="absolute top-1/3 right-0 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl translate-x-1/2" />
 
+      <div className="section-container relative">
         {/* Pricing Grid */}
-        <div className="grid md:grid-cols-3 gap-8 lg:gap-10 items-stretch max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8 items-center max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <PricingCard key={plan.name} plan={plan} index={index} />
           ))}
@@ -165,7 +248,7 @@ const Pricing = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center text-slate-500 text-xs font-bold uppercase tracking-widest mt-16"
+          className="text-center text-slate-400 text-sm mt-12"
         >
           30-day money-back guarantee • No credit card required for free plan
         </motion.p>

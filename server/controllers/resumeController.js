@@ -1,33 +1,22 @@
 const Resume = require('../models/Resume');
-const User = require('../models/User');
 const pdfService = require('../services/pdfService');
 
 exports.saveResume = async (req, res) => {
     try {
         const { title, data, template } = req.body;
-        const userId = req.user.id;
-
-        // Check subscription limits
-        const user = await User.findById(userId);
-        const resumeCount = await Resume.countDocuments({ user: userId });
-
-        if (user.subscription.plan === 'free' && resumeCount >= 1) {
-            return res.status(403).json({ 
-                error: 'Free plan limit reached. Upgrade to Pro for unlimited resumes.',
-                limitReached: true 
-            });
-        }
-
         const resume = new Resume({
-            user: userId,
+            user: req.user.id,
             title,
             data,
             template
         });
         await resume.save();
-        
-        // Update user usage
-        await User.findByIdAndUpdate(userId, { $inc: { 'usage.resumesCreated': 1 } });
+
+        // Increment user's resume count
+        const User = require('../models/User');
+        await User.findByIdAndUpdate(req.user.id, {
+            $inc: { 'usage.resumesCreated': 1 }
+        });
 
         res.status(201).json(resume);
     } catch (err) {
@@ -38,7 +27,15 @@ exports.saveResume = async (req, res) => {
 exports.generatePDF = async (req, res) => {
     try {
         const { htmlContent } = req.body;
-        const pdfBuffer = await pdfService.generatePDF(htmlContent);
+
+        // Determine if user is Pro — Pro users get clean PDFs, free users get watermarked
+        const isPro = req.user && req.user.subscription.plan === 'pro' && req.user.subscription.status === 'active';
+
+        const pdfBuffer = await pdfService.generatePDF(htmlContent, {
+            addWatermark: !isPro,
+            userName: req.user ? req.user.name : ''
+        });
+
         res.contentType("application/pdf");
         res.send(pdfBuffer);
     } catch (err) {

@@ -4,6 +4,7 @@ const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
     avatar: { type: String },
     subscription: {
         plan: { type: String, enum: ['free', 'pro', 'enterprise'], default: 'free' },
@@ -45,7 +46,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Update timestamp on save
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
     this.updatedAt = Date.now();
     next();
 });

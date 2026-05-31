@@ -5,3 +5,4 @@ export { ToastContainer } from './ToastContainer';
 export { LoadingSpinner, LoadingButton } from './LoadingSpinner';
 export { Skeleton, SkeletonText, SkeletonCard, SkeletonResumeCard } from './Skeleton';
 export { EmptyState, ErrorState } from './StateViews';
+export { default as SectionDivider } from './SectionDivider';

@@ -15,7 +15,16 @@ exports.register = async (req, res) => {
         await user.save();
 
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        res.json({ token, user: { id: user.id, name, email } });
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                name,
+                email,
+                role: user.role,
+                subscription: user.subscription
+            }
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -31,7 +40,32 @@ exports.login = async (req, res) => {
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        res.json({ token, user: { id: user.id, name: user.name, email, subscription: user.subscription } });
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email,
+                role: user.role,
+                subscription: user.subscription
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        res.json({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            subscription: user.subscription,
+            usage: user.usage
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

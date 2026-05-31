@@ -2,7 +2,7 @@ import React from 'react';
 
 const ExecutiveTemplate = ({ data, scale = 1, isPreview = false }) => {
   const { personalInfo, summary, experience, skills, education, achievements } = data;
-  
+
   const containerStyle = {
     transform: `scale(${scale})`,
     transformOrigin: 'top left',
@@ -59,6 +59,15 @@ const ExecutiveTemplate = ({ data, scale = 1, isPreview = false }) => {
     marginBottom: '15px'
   };
 
+  const dividerStyle = {
+    borderBottom: '1px solid #333333',
+    marginTop: '10px',
+    marginBottom: '10px',
+    width: 'calc(100% - 40px)',
+    marginLeft: '20px',
+    marginRight: '20px'
+  };
+
   const contentStyle = {
     color: '#e5e5e5'
   };
@@ -100,30 +109,27 @@ const ExecutiveTemplate = ({ data, scale = 1, isPreview = false }) => {
     fontStyle: 'italic'
   };
 
-  return (
-    <div style={containerStyle} className="executive-template">
-      {/* White Header Card */}
-      <div style={headerStyle}>
-        <h1 style={nameStyle}>{personalInfo?.name || 'Your Name'}</h1>
-        <p style={titleStyle}>{personalInfo?.title || 'Executive Title'}</p>
-        <div style={contactStyle}>
-          {personalInfo?.email && <span>{personalInfo.email}</span>}
-          {personalInfo?.phone && <span>{personalInfo.phone}</span>}
-          {personalInfo?.location && <span>{personalInfo.location}</span>}
-          {personalInfo?.linkedin && <span>{personalInfo.linkedin}</span>}
-        </div>
-      </div>
+  // Build visible sections array
+  const sections = [];
 
-      {/* Summary */}
-      {summary && (
+  // Summary
+  if (summary) {
+    sections.push({
+      key: 'summary',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Executive Summary</h2>
           <p style={contentStyle}>{summary}</p>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Experience */}
-      {experience && experience.length > 0 && (
+  // Experience
+  if (experience && experience.length > 0) {
+    sections.push({
+      key: 'experience',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Professional Experience</h2>
           {experience.map((job, index) => (
@@ -145,31 +151,46 @@ const ExecutiveTemplate = ({ data, scale = 1, isPreview = false }) => {
             </div>
           ))}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Key Achievements */}
-      {achievements && achievements.length > 0 && (
+  // Key Achievements
+  if (achievements && achievements.length > 0) {
+    sections.push({
+      key: 'achievements',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Distinguished Achievements</h2>
           {achievements.slice(0, 4).map((achievement, i) => (
             <p key={i} style={achievementStyle}>★ {achievement}</p>
           ))}
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Skills */}
-      {skills && (
+  // Skills
+  if (skills) {
+    sections.push({
+      key: 'skills',
+      content: (
         <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Leadership Competencies</h2>
           <p style={{ ...contentStyle, fontSize: '10px' }}>
             {skills.technical?.join(' • ')}
           </p>
         </div>
-      )}
+      )
+    });
+  }
 
-      {/* Education */}
-      {education && education.length > 0 && (
-        <div style={{ ...sectionStyle, paddingBottom: '30px' }}>
+  // Education
+  if (education && education.length > 0) {
+    sections.push({
+      key: 'education',
+      content: (
+        <div style={sectionStyle}>
           <h2 style={sectionTitleStyle}>Academic Credentials</h2>
           {education.map((edu, index) => (
             <div key={index} style={{ marginBottom: '8px' }}>
@@ -178,7 +199,31 @@ const ExecutiveTemplate = ({ data, scale = 1, isPreview = false }) => {
             </div>
           ))}
         </div>
-      )}
+      )
+    });
+  }
+
+  return (
+    <div style={containerStyle} className="executive-template">
+      {/* White Header Card */}
+      <div style={headerStyle}>
+        <h1 style={nameStyle}>{personalInfo?.name || 'Your Name'}</h1>
+        <p style={titleStyle}>{personalInfo?.title || 'Executive Title'}</p>
+        <div style={contactStyle}>
+          {personalInfo?.email && <span>{personalInfo.email}</span>}
+          {personalInfo?.phone && <span>{personalInfo.phone}</span>}
+          {personalInfo?.location && <span>{personalInfo.location}</span>}
+          {personalInfo?.linkedin && <span>{personalInfo.linkedin}</span>}
+        </div>
+      </div>
+
+      {/* Sections with dividers */}
+      {sections.map((section, index) => (
+        <React.Fragment key={section.key}>
+          {section.content}
+          {index < sections.length - 1 && <div style={dividerStyle} />}
+        </React.Fragment>
+      ))}
     </div>
   );
 };
