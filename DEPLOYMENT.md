@@ -1,5 +1,4 @@
 # ResumeForge Pro - Deployment Guide
-
 ## Prerequisites
 
 Before deploying, ensure you have:
