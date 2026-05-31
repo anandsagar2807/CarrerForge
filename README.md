@@ -1,46 +1,61 @@
 # ResumeForge Pro
 
-A professional AI-powered resume builder with advanced features including ATS optimization, AI bullet rewriting, interview preparation, and cover letter generation. Now powered by **OpenRouter API** for flexible, cost-effective AI access.
+AI-powered resume builder with ATS analysis, bullet rewriting, cover letter generation, interview preparation, and a career chat assistant.
 
-# 🚀 Features
-- **8 Professional Templates**
-  - Modern
-  - ATS-friendly
-  - Creative
-  - Executive
-  - Minimalist
-  - Tech
-  - Compact
-  - Professional
-
-- **AI-Powered Analysis (via OpenRouter)**
-  - ATS Score Checker with industry benchmarks
-  - Resume bullet point rewriter
-  - Job description analyzer
-  - Interview question generator
-
-- **Smart Resume Builder**
-  - Guided wizard
-  - Real-time preview
-  - Auto-save support
-
-- **Cover Letter Generator**
-  - AI-generated personalized cover letters
-
-- **AI Chat Assistant**
-  - Career guidance
-  - Resume optimization tips
-  - Job search strategies
-
-- **Export Options**
-  - Professional PDF downloads
+Built as a full-stack app:
+- **Frontend:** React + Vite + TailwindCSS + Framer Motion
+- **Backend:** Node.js + Express + MongoDB + JWT
+- **AI:** OpenAI-compatible SDK (configured for **Groq** and/or **OpenRouter**) + rate limiting
+- **Payments:** Stripe (optional)
 
 ---
 
-# 🛠️ Tech Stack
+## Key Features
 
-## Frontend
+### Resume Building
+- **8 professional templates** (Modern, ATS-friendly, Creative, Executive, Minimalist, Tech, Compact, Professional)
+- Guided resume builder experience
+- Real-time preview
+- Export to **PDF**
 
+### AI Tools
+- **ATS Score Checker** (resume vs job description)
+  - section scoring (skills/experience/education/keywords)
+  - found vs missing keywords
+  - actionable improvement tips
+- **AI Bullet Rewriter**
+  - turns basic bullets into impact-focused achievements
+- **Cover Letter Generator**
+  - personalized letters from resume + job description
+- **Interview Prep Generator**
+  - role-specific behavioral + technical questions
+- **AI Career Chat Assistant**
+  - conversational guidance (no markdown formatting)
+
+### UX / UI Improvements
+- Premium UI polish (light theme direction, smooth animations)
+- Enhanced templates header and layout improvements
+- Fullscreen layout across pages
+
+---
+
+## App Routes
+
+| Page | Route |
+|------|-------|
+| Home | `/` |
+| Templates | `/templates` |
+| Analyze (ATS + Bullet Rewriter) | `/analyze` |
+| Resume Builder | `/builder` |
+| Cover Letter | `/cover-letter` |
+| Chat Assistant | `/chat` |
+| Interview Prep | `/interview-prep` |
+
+---
+
+## Tech Stack
+
+### Frontend
 - React 18
 - Vite
 - TailwindCSS
@@ -48,52 +63,43 @@ A professional AI-powered resume builder with advanced features including ATS op
 - React Router
 - Lucide Icons
 
-## Backend
-
+### Backend
 - Node.js
-- Express.js
-- MongoDB with Mongoose
+- Express
+- MongoDB + Mongoose
 - JWT Authentication
-- Stripe Payment Integration
-- OpenRouter API
+- Rate limiting
+- Stripe (optional)
 
 ---
 
-# 📦 Getting Started
+## Getting Started (Local Development)
 
-## Prerequisites
-
-Make sure you have the following installed:
-
-- Node.js 18+
-- MongoDB 6+
+### Prerequisites
+- Node.js **18+**
+- MongoDB (local or Atlas)
 - npm or yarn
-- OpenRouter API Key  
-  👉 https://openrouter.ai
+- AI key(s): **GROQ_API_KEY** and/or **OPENROUTER_API_KEY**
 
 ---
 
-# ⚙️ Installation
+## Installation
 
-## 1. Clone the Repository
+### 1) Clone
 
 ```bash
 git clone <your-repo-url>
-cd ResumeForge-Pro
+cd CarrerForgePro2
 ```
 
----
-
-## 2. Install Backend Dependencies
+### 2) Backend dependencies
 
 ```bash
 cd server
 npm install
 ```
 
----
-
-## 3. Install Frontend Dependencies
+### 3) Frontend dependencies
 
 ```bash
 cd ../frontend
@@ -102,44 +108,46 @@ npm install
 
 ---
 
-# 🔑 Environment Variables
+## Environment Variables
 
-## Backend `.env`
+> Do not commit real secrets. Use `.env` locally and hosting provider dashboards in production.
+
+### Backend (`server/.env`)
 
 ```env
+# Server
+NODE_ENV=development
 PORT=5000
 
+# Database
 MONGODB_URI=mongodb://localhost:27017/resumeforge
 
+# Auth
 JWT_SECRET=your-super-secret-jwt-key
 
+# CORS
 CLIENT_URL=http://localhost:5173
 
-NODE_ENV=development
+# AI (Groq)
+GROQ_API_KEY=your_groq_api_key
 
-# OpenRouter Configuration
+# AI (OpenRouter)
 OPENROUTER_API_KEY=your_openrouter_api_key
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 OPENROUTER_MODEL=openai/gpt-3.5-turbo
-
-# Optional Fallback Model
 OPENROUTER_FALLBACK_MODEL=anthropic/claude-2
-
-# OpenRouter Optional Headers
 OPENROUTER_SITE_URL=http://localhost:5173
 OPENROUTER_SITE_NAME=ResumeForgePro
 
-# Stripe Configuration
+# Stripe (optional)
 STRIPE_SECRET_KEY=your_stripe_key
 
-# Rate Limiting
+# Rate limiting (optional)
 AI_REQUESTS_PER_MINUTE=30
 AI_REQUESTS_PER_DAY=1000
 ```
 
----
-
-## Frontend `.env`
+### Frontend (`frontend/.env`)
 
 ```env
 VITE_API_URL=http://localhost:5000/api
@@ -147,83 +155,37 @@ VITE_API_URL=http://localhost:5000/api
 
 ---
 
-# ▶️ Running the Application
+## Running the App
 
-## Start Backend Server
+### Start backend
 
 ```bash
 cd server
 npm run dev
 ```
 
----
-
-## Start Frontend Server
+### Start frontend
 
 ```bash
 cd frontend
 npm run dev
 ```
 
----
-
-## Open Browser
-
-```txt
-http://localhost:5173
-```
+Open:
+- Frontend: `http://localhost:5173`
 
 ---
 
-# 📁 Project Structure
+## API Endpoints
 
-```text
-ResumeForge-Pro/
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   ├── pages/           # Page components
-│   │   ├── context/         # React context providers
-│   │   ├── services/        # API services
-│   │   ├── hooks/           # Custom React hooks
-│   │   └── types/           # TypeScript types
-│   │
-│   ├── public/              # Static assets
-│   └── package.json
-│
-├── server/
-│   ├── controllers/         # Route controllers
-│   ├── models/              # MongoDB models
-│   ├── routes/              # API routes
-│   ├── services/
-│   │   └── aiService.js     # OpenRouter AI integration
-│   │
-│   ├── middleware/          # Express middleware
-│   ├── config/
-│   │   └── openrouter.js    # OpenRouter configuration
-│   │
-│   └── package.json
-│
-└── DEPLOYMENT.md            # Deployment guide
-```
-
----
-
-# 🔌 API Endpoints
-
-# Authentication Routes
-
+### Authentication
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/auth/register` | User registration |
 | POST | `/api/auth/login` | User login |
 | GET | `/api/auth/me` | Get current user |
 
----
-
-# Resume Routes
-
+### Resume
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/resume/create` | Create resume |
@@ -232,10 +194,7 @@ ResumeForge-Pro/
 | DELETE | `/api/resume/:id` | Delete resume |
 | GET | `/api/resume/user/:userId` | Get user resumes |
 
----
-
-# AI Routes (OpenRouter Powered)
-
+### AI
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/ai/analyze-ats` | ATS score analysis |
@@ -244,10 +203,7 @@ ResumeForge-Pro/
 | POST | `/api/ai/interview-questions` | Generate interview questions |
 | POST | `/api/ai/chat` | AI chat assistant |
 
----
-
-# Payment Routes
-
+### Payments (Optional)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/payment/create-checkout` | Stripe checkout |
@@ -255,390 +211,51 @@ ResumeForge-Pro/
 
 ---
 
-# 🤖 AI-Powered Resume Analysis
+## Project Structure
 
-## ATS Score Checker
-
-- Resume ATS scoring
-- Industry benchmark comparison
-- Formatting analysis
-- Keyword optimization
-
----
-
-## OpenRouter Integration Benefits
-
-### ✅ Multiple Models
-
-Access 100+ AI models through one API.
-
-### ✅ Cost Optimization
-
-Use cheaper models for fast tasks and premium models for advanced analysis.
-
-### ✅ Automatic Fallback Support
-
-Fallback to secondary models if the primary fails.
-
-### ✅ Rate Limiting
-
-Built-in request limiting support.
-
-### ✅ Usage Analytics
-
-Monitor token usage and API cost.
-
----
-
-# 🧠 Smart Resume Builder
-
-- Real-time preview
-- Step-by-step guided builder
-- Professional resume templates
-- Auto-save functionality
-
----
-
-# ✨ AI Bullet Point Rewriter
-
-Transforms simple bullet points into professional achievements.
-
-### Features
-
-- Strong action verbs
-- Quantifiable metrics
-- Industry-tailored writing
-- Multiple variations
-
----
-
-# 📝 Cover Letter Generator
-
-Generate personalized AI cover letters based on:
-
-- Resume content
-- Job descriptions
-- Industry role
-
----
-
-# 🎯 Interview Preparation
-
-Generate:
-
-- Behavioral interview questions
-- Technical interview questions
-- Industry-specific questions
-- Interview tips and best practices
-
----
-
-# 💬 AI Chat Assistant
-
-Provides:
-
-- Career guidance
-- Resume improvement tips
-- Job search strategies
-- Real-time assistance
-
----
-
-# ⚡ OpenRouter Configuration
-
-## Example Model Configuration
-
-```javascript
-const MODELS = {
-  fast: 'openai/gpt-3.5-turbo',
-  balanced: 'anthropic/claude-2',
-  premium: 'openai/gpt-4-turbo',
-  coding: 'meta-llama/llama-2-70b',
-  analysis: 'google/gemini-pro'
-}
+```text
+CarrerForgePro2/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── context/
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   └── types/
+│   └── package.json
+├── server/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   ├── middleware/
+│   ├── config/
+│   └── package.json
+└── DEPLOYMENT.md
 ```
 
 ---
 
-# 🚦 Rate Limiting
+## Documentation
 
-```javascript
-AI_REQUESTS_PER_MINUTE=30
-AI_REQUESTS_PER_DAY=1000
-```
-
----
-
-# 📊 Usage Tracking Example
-
-```json
-{
-  "model": "openai/gpt-3.5-turbo",
-  "prompt_tokens": 150,
-  "completion_tokens": 200,
-  "total_tokens": 350,
-  "cost_usd": 0.0007
-}
-```
+- `DEPLOYMENT.md` — production deployment guide (Vercel + Render/Railway + Atlas)
+- `HEADER_IMPROVEMENTS.md` — header/navigation UI improvements summary
+- `CHATBOT_FIXES.md` — chatbot behavior + verification steps
+- `PROJECT_SUMMARY.md` / `UPDATES_SUMMARY.md` — implementation notes and delivered changes
 
 ---
 
-# 🚀 Deployment
-
-# Production Checklist
-
-- ✅ Strong JWT Secret
-- ✅ MongoDB Authentication
-- ✅ HTTPS/TLS Enabled
-- ✅ Proper Rate Limiting
-- ✅ Secure CORS Configuration
-- ✅ Security Headers Enabled
-- ✅ Monitoring & Alerts
-- ✅ Backup Strategy
-- ✅ OpenRouter API Key Added
-- ✅ Fallback Models Configured
-- ✅ Stripe Webhooks Configured
-
----
-
-# ☁️ Quick Deployment Platforms
-
-| Service | Platform |
-|---------|----------|
-| Frontend | Vercel / Netlify |
-| Backend | Render / Railway / Heroku |
-| Database | MongoDB Atlas |
-| AI Provider | OpenRouter |
-
----
-
-# 📄 Environment Variables Reference
-
-## Required Variables
-
-```env
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
-OPENROUTER_API_KEY=your_openrouter_api_key
-```
-
----
-
-## Optional Variables
-
-```env
-STRIPE_SECRET_KEY=for_payment_processing
-CLIENT_URL=http://localhost:5173
-PORT=5000
-
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPENROUTER_MODEL=openai/gpt-3.5-turbo
-OPENROUTER_FALLBACK_MODEL=anthropic/claude-2
-OPENROUTER_SITE_URL=http://localhost:5173
-OPENROUTER_SITE_NAME=ResumeForgePro
-
-AI_REQUESTS_PER_MINUTE=30
-AI_REQUESTS_PER_DAY=1000
-```
-
----
-
-# 🧩 AI Service Implementation Example
-
-```javascript
-// server/services/aiService.js
-
-import { OpenRouter } from '../config/openrouter.js';
-
-class AIService {
-  constructor() {
-    this.client = new OpenRouter({
-      apiKey: process.env.OPENROUTER_API_KEY,
-      baseURL: process.env.OPENROUTER_BASE_URL,
-      defaultModel: process.env.OPENROUTER_MODEL,
-      fallbackModel: process.env.OPENROUTER_FALLBACK_MODEL
-    });
-  }
-
-  async analyzeATS(resumeText, jobDescription) {
-    try {
-      const response = await this.client.chat({
-        model: 'openai/gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an ATS resume analysis expert...'
-          },
-          {
-            role: 'user',
-            content: `Analyze this resume: ${resumeText}\nJob: ${jobDescription}`
-          }
-        ]
-      });
-
-      return response;
-
-    } catch (error) {
-
-      // Automatic fallback
-      return await this.client.chatWithFallback(error);
-    }
-  }
-}
-
-export default AIService;
-```
-
----
-
-# 🧪 Testing
-
-## Backend Tests
-
-```bash
-cd server
-npm test
-```
-
----
-
-## Frontend Tests
-
-```bash
-cd frontend
-npm test
-```
-
----
-
-## Test OpenRouter Connection
-
-```bash
-node server/test/openrouter.test.js
-```
-
----
-
-# 🛠️ Troubleshooting
-
-# Issue: Invalid API Key
-
-```bash
-curl https://openrouter.ai/api/v1/auth/key \
-  -H "Authorization: Bearer $OPENROUTER_API_KEY"
-```
-
----
-
-# Issue: Rate Limit Exceeded
-
-### Solution
-
-- Implement exponential backoff
-- Upgrade OpenRouter plan
-- Monitor usage dashboard
-
-```txt
-https://openrouter.ai/activity
-```
-
----
-
-# Issue: Model Not Available
-
-### Solution
-
-Use available fallback models.
-
-```txt
-https://openrouter.ai/models
-```
-
----
-
-# 🤝 Contributing
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-
-```bash
-git checkout -b feature/AmazingFeature
-```
-
-3. Commit changes
-
-```bash
-git commit -m "Add some AmazingFeature"
-```
-
-4. Push changes
-
-```bash
-git push origin feature/AmazingFeature
-```
-
+2. Create a branch: `git checkout -b feature/my-change`
+3. Commit: `git commit -m "feat: add my change"`
+4. Push: `git push origin feature/my-change`
 5. Open a Pull Request
 
 ---
 
-# 📚 Documentation
+## License
 
-- API Reference
-- Deployment Guide
-- Contribution Guide
-
----
-
-# 📜 License
-
-This project is licensed under the **MIT License**.
-
----
-
-# 📞 Support
-
-## Contact
-
-- Email: support@resumeforge.com
-- GitHub Issues: Open an issue
-- OpenRouter Docs: https://openrouter.ai/docs
-
----
-
-# 🙏 Acknowledgments
-
-Special thanks to:
-
-- OpenRouter
-- MongoDB
-- React
-- Vite
-- TailwindCSS
-- Stripe
-- OpenAI
-- Anthropic
-- Meta
-- Google
-
----
-
-# 🕘 Version History
-
-| Version | Changes |
-|---------|----------|
-| v1.0.0 | Initial release with OpenAI |
-| v1.1.0 | Migrated to OpenRouter API |
-| v1.2.0 | Added multi-model support |
-| v1.3.0 | Enhanced rate limiting and usage tracking |
-
----
-
-# ❤️ Built With Passion
-
-Built with ❤️ for job seekers using OpenRouter's unified AI API.
-
----
-
-# ✅ Status
-
-## Production Ready
+MIT
