@@ -1,4 +1,4 @@
-# ResumeForge Pro - Production Ready Checklist
+# CarrerForgePro - Production Ready Checklist
 
 ## ✅ Completed Features
 
@@ -70,12 +70,14 @@
 
 ### Environment Variables Needed
 
+> Security note: never commit real secrets (API keys, DB passwords) to GitHub. Use your hosting provider’s environment variables.
+
 **Backend (Production)**
 ```
 PORT=5000
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.a5fvwyx.mongodb.net/?appName=Cluster0
 OPENAI_API_KEY=your_openai_api_key_here
-GROQ_API_KEY=gsk_your_groq_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 CLIENT_URL=https://your-frontend-url.vercel.app
 NODE_ENV=production
 ```
@@ -147,7 +149,7 @@ VITE_API_URL=https://your-backend-url.onrender.com
 1. **Push to GitHub**
    ```bash
    git add .
-   git commit -m "Production ready: ResumeForge Pro with premium features"
+   git commit -m "Production ready: CarrerForgePro with premium features"
    git push origin main
    ```
 
@@ -182,4 +184,4 @@ All features are working, backend is connected to MongoDB Atlas, and the applica
 
 ---
 
-**Built with ❤️ - ResumeForge Pro**
+**Built with ❤️ - CarrerForgePro**
