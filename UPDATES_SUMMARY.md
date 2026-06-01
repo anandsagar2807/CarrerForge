@@ -1,4 +1,4 @@
-# ResumeForge Pro - Updates Summary
+# CarrerForgePro - Updates Summary
 
 ## ✅ All Updates Completed Successfully!
 
