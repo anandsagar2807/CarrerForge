@@ -27,6 +27,7 @@ import Pricing from '../components/Pricing';
 import FAQ from '../components/FAQ';
 import PremiumFooter from '../components/PremiumFooter';
 import PremiumHeroShowcase from '../components/PremiumHeroShowcase';
+import InteractivePlayground from '../components/InteractivePlayground';
 
 /* ─── Animation Variants ─── */
 const badgeVariants = {
@@ -736,6 +737,9 @@ const LandingPage = () => {
 
         {/* Stats */}
         <StatsBar />
+
+        {/* AI Playground */}
+        <InteractivePlayground />
 
         {/* Features */}
         <section id="powerful-features" className="py-24 lg:py-32 bg-white">
