@@ -1,7 +1,4 @@
 # CarrerForge Pro - Deployment Guide
-
-> Repo: **anandsagar2807/CarrerForgePro2**
-
 ## Prerequisites
 Before deploying, ensure you have:
 - Node.js **18+** installed
