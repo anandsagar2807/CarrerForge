@@ -3,19 +3,19 @@
 ## Current UI Behavior (What users see now)
 
 ### 1) Home Page (Landing Page)
-- ✅ **Navbar removed** for a cleaner, more immersive landing experience
-- ✅ Landing content uses full viewport layout for better focus on the hero/CTA
+- **Navbar removed** for a cleaner, more immersive landing experience
+- Landing content uses full viewport layout for better focus on the hero/CTA
 
 **File:** `frontend/src/pages/LandingPage.jsx`
 
 ### 2) Templates Page
-- ✅ **Navbar removed** (matches the fullscreen/immersive direction)
-- ✅ Templates page continues to support search, filtering, and template selection
-- ✅ Dynamic template flow remains intact ("Use This Template" → customization → AI-generated content)
+- **Navbar removed** (matches the fullscreen/immersive direction)
+- Templates page continues to support search, filtering, and template selection
+- Dynamic template flow remains intact ("Use This Template" → customization → AI-generated content)
 
 **File:** `frontend/src/pages/TemplatesPage.jsx`
 
-## ✅ Fullscreen Layout Standardization
+## Fullscreen Layout Standardization
 The following pages were updated to use fullscreen-friendly layouts (e.g., `flex flex-col`, proper viewport filling) and to avoid header interference:
 
 - `frontend/src/pages/Analyze.jsx`
