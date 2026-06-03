@@ -4,7 +4,7 @@ AI-powered resume builder with ATS analysis, bullet rewriting, cover letter gene
 
 Built as a full-stack app:
 - **Frontend:** React + Vite + TailwindCSS + Framer Motion
-- **Backend:** Node.js + Express + MongoDB + JWT
+- **Backend:** Node.js + Express + MongoDB 
 - **AI:** OpenAI-compatible SDK (configured for **Groq** and/or **OpenRouter**) + rate limiting
 - **Payments:** Stripe (optional)
 
