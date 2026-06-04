@@ -1,6 +1,5 @@
 # Chatbot Fixes
 ## Issues Fixed
-
 ### 1. Auto-Redirect to Header Issue
 **Problem**: When opening the chatbot page, it was automatically scrolling to the top/header instead of staying on the chat interface.
 
@@ -79,7 +78,6 @@ To test the fixes:
 ## Files Modified
 
 - `frontend/src/pages/ChatPage.jsx`
-
 ---
 
 ## Result
