@@ -1,5 +1,4 @@
 # ResumeForge Pro - Header & Layout Updates (Current State)
-
 ## Current UI Behavior (What users see now)
 ### 1) Home Page (Landing Page)
 - **Navbar removed** for a cleaner, more immersive landing experience
